@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ortaokul Ders Materyalleri</title>
     <style>
-        /* Sizin belirlediğiniz renk şeması (Design Tokens) */
         :root {
             --bg: #0d0e15;
             --surface: #161626;
@@ -19,17 +18,15 @@
             --transition: 0.3s ease;
         }
 
-        /* Genel sayfa ayarları */
         body { 
             margin: 0; 
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             height: 100vh; 
             overflow: hidden; 
-            background: var(--bg); /* Ana arka plan */
+            background: var(--bg); 
             color: var(--text);
         }
 
-        /* Yüzen Menü Butonu */
         .floating-menu-btn {
             position: fixed;
             top: 20px;
@@ -51,15 +48,14 @@
 
         .floating-menu-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px); /* Üzerine gelince hafif yukarı kalkma efekti */
+            transform: translateY(-2px);
             color: var(--blue);
         }
 
-        /* Yan Menü (Sidebar) Ayarları */
         #sidebar {
             position: fixed; 
             top: 0; 
-            left: -320px; /* Başlangıçta gizli */
+            left: -320px; 
             width: 300px; 
             height: 100%;
             background: var(--surface); 
@@ -88,7 +84,7 @@
             background: var(--surface-card); 
             color: var(--blue);
             padding-left: 36px; 
-            border-left: 4px solid var(--blue); /* Hover durumunda sol tarafta şık bir çizgi */
+            border-left: 4px solid var(--blue);
         }
 
         .close-btn { 
@@ -108,24 +104,24 @@
             transform: scale(1.1);
         }
 
-        /* İçeriğin Gösterileceği Alan (Iframe) */
         #contentFrame { 
             width: 100%; 
             height: 100vh; 
             border: none; 
             display: block;
-            background: var(--bg); /* İframe arkasını da ana renkle doldurduk */
+            background: var(--bg);
         }
     </style>
 </head>
 <body>
 
-    <!-- Yüzen Buton -->
     <button class="floating-menu-btn" onclick="toggleSidebar()">☰</button>
 
-    <!-- Yan Menü -->
     <div id="sidebar">
         <button class="close-btn" onclick="toggleSidebar()">×</button>
+        
+        <!-- Hakkında / Karşılama Sayfası -->
+        <a href="about.html" target="contentArea" onclick="toggleSidebar()" style="color: var(--blue);">🏠 Hakkında / Ana Sayfa</a>
         
         <a href="mat_Sayi_Dogrusu-toplacikar.html" target="contentArea" onclick="toggleSidebar()">Topla Çıkar</a>
         <a href="mat_üslü_sayilar.html" target="contentArea" onclick="toggleSidebar()">Üslü Sayılar</a>
@@ -133,19 +129,14 @@
         <a href="mat_ EBOB ve EKOK.html" target="contentArea" onclick="toggleSidebar()">EBOB EKOK</a>
         <a href="mat_karekök_ayiklama.html" target="contentArea" onclick="toggleSidebar()">Karekök Ayıklama</a>
         <a href="mat_karakök_oranOranti.html" target="contentArea" onclick="toggleSidebar()">Karekök Oran</a>
-
         <a href="mat_alan_modeli_ozdeslik.html" target="contentArea" onclick="toggleSidebar()">Özdeşlik</a>
         <a href="mat_Cebirsel İfadeler.html" target="contentArea" onclick="toggleSidebar()">Cebirsel İfadeler</a>
         <a href="mat_havuz problemleri+.html" target="contentArea" onclick="toggleSidebar()">Havuz Problemleri</a>        
-        
         <a href="mat_oran.html" target="contentArea" onclick="toggleSidebar()">ORAN</a>
-        
-        
-        
     </div>
 
-    <!-- İlgili HTML dosyalarının gösterileceği alan -->
-    <iframe name="contentArea" id="contentFrame" src="matematik.html"></iframe>
+    <!-- İlk açılışta boş gelmemesi için about.html yönlendirildi[cite: 4] -->
+    <iframe name="contentArea" id="contentFrame" src="about.html"></iframe>
 
     <script>
         function toggleSidebar() {
