@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hale'nin Matematik Laboratuvarı</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background:
+        radial-gradient(circle at 50% 50%, #21104a 0%, #0b0620 38%, #02030d 78%, #000 100%);
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+/* Matematiksel arka plan deseni */
+body::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    opacity: .22;
+    background-image:
+        linear-gradient(rgba(150, 110, 255, .35) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(150, 110, 255, .35) 1px, transparent 1px);
+    background-size: 70px 70px;
+    transform: perspective(600px) rotateX(62deg) translateY(18%);
+    transform-origin: center;
+    animation: gridMove 18s linear infinite;
+}
+
+@keyframes gridMove {
+    from { background-position: 0 0, 0 0; }
+    to   { background-position: 70px 70px, 70px 70px; }
+}
+
+/* Parlayan geometrik şekiller */
+.shape {
+    position: absolute;
+    pointer-events: none;
+    opacity: .75;
+    filter: blur(.2px);
+}
+
+.circle {
+    width: 220px;
+    height: 220px;
+    border: 2px solid #b967ff;
+    border-radius: 50%;
+    box-shadow:
+        0 0 20px #b967ff,
+        inset 0 0 25px rgba(185,103,255,.35);
+    top: 8%;
+    left: 7%;
+    animation: float1 7s ease-in-out infinite;
+}
+
+.circle::after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border: 1px solid #4deeea;
+    border-radius: 50%;
+    top: 47px;
+    left: 47px;
+    box-shadow: 0 0 18px #4deeea;
+}
+
+.square {
+    width: 150px;
+    height: 150px;
+    border: 2px solid #4deeea;
+    right: 9%;
+    bottom: 9%;
+    transform: rotate(28deg);
+    box-shadow: 0 0 25px #4deeea;
+    animation: spin 16s linear infinite;
+}
+
+.triangle {
+    width: 0;
+    height: 0;
+    border-left: 85px solid transparent;
+    border-right: 85px solid transparent;
+    border-bottom: 150px solid transparent;
+    border-bottom-color: rgba(255, 77, 166, .08);
+    filter:
+        drop-shadow(0 0 8px #ff4da6)
+        drop-shadow(0 0 22px #ff4da6);
+    top: 12%;
+    right: 14%;
+    animation: float2 8s ease-in-out infinite;
+}
+
+.ring {
+    width: 330px;
+    height: 330px;
+    border: 1px solid rgba(77,238,234,.45);
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow:
+        0 0 35px rgba(77,238,234,.2),
+        inset 0 0 35px rgba(185,103,255,.15);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+/* Küçük ışık parçacıkları */
+.spark {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 8px white, 0 0 18px #b967ff;
+    animation: twinkle 2s ease-in-out infinite alternate;
+}
+
+.s1 { left: 20%; top: 27%; animation-delay: .2s; }
+.s2 { left: 78%; top: 31%; animation-delay: .8s; }
+.s3 { left: 14%; top: 72%; animation-delay: 1.3s; }
+.s4 { left: 85%; top: 68%; animation-delay: .5s; }
+.s5 { left: 31%; top: 14%; animation-delay: 1.8s; }
+.s6 { left: 68%; top: 83%; animation-delay: 1s; }
+
+/* Başlık */
+.content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 30px;
+}
+
+.glow {
+    margin: 0;
+    max-width: 1100px;
+    font-size: clamp(42px, 7vw, 94px);
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+    text-shadow:
+        0 0 5px #fff,
+        0 0 12px #fff,
+        0 0 25px #d66cff,
+        0 0 45px #b967ff,
+        0 0 70px #7a2cff,
+        0 0 100px #7a2cff;
+    animation: glow 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        filter: brightness(.95);
+        text-shadow:
+            0 0 5px #fff,
+            0 0 12px #fff,
+            0 0 22px #d66cff,
+            0 0 38px #b967ff,
+            0 0 60px #7a2cff;
+    }
+    to {
+        filter: brightness(1.18);
+        text-shadow:
+            0 0 8px #fff,
+            0 0 18px #fff,
+            0 0 32px #ff8de1,
+            0 0 55px #d66cff,
+            0 0 85px #9b5cff,
+            0 0 120px #7a2cff;
+    }
+}
+
+@keyframes float1 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(25px, 20px) rotate(18deg); }
+}
+
+@keyframes float2 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-20px, 25px) rotate(12deg); }
+}
+
+@keyframes spin {
+    to { transform: rotate(388deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: .3; transform: translate(-50%, -50%) scale(.92); }
+    50% { opacity: .7; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+@keyframes twinkle {
+    from { opacity: .2; transform: scale(.7); }
+    to { opacity: 1; transform: scale(1.8); }
+}
+
+@media (max-width: 600px) {
+    .circle {
+        width: 130px;
+        height: 130px;
+    }
+
+    .circle::after {
+        width: 70px;
+        height: 70px;
+        top: 28px;
+        left: 28px;
+    }
+
+    .square {
+        width: 90px;
+        height: 90px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="shape circle"></div>
+<div class="shape square"></div>
+<div class="shape triangle"></div>
+<div class="shape ring"></div>
+
+<div class="spark s1"></div>
+<div class="spark s2"></div>
+<div class="spark s3"></div>
+<div class="spark s4"></div>
+<div class="spark s5"></div>
+<div class="spark s6"></div>
+
+<main class="content">
+    <h1 class="glow">Hale'nin Matematik Laboratuvarı</h1>
+</main>
+
+</body>
+</html>
