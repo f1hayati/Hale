@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Üslü Sayı Simülasyonu</title>
+    <style>
+        :root {
+            --bg: #1e1e2e;
+            --surface: #2a2a35;
+            --text: #cdd6f4;
+            --blue: #89b4fa;
+            --green: #a6e3a1;
+            --red: #f38ba8;
+            --yellow: #f9e2af;
+            --mauve: #cba6f7;
+            --peach: #fab387;
+            --sky: #74c7ec;
+            --orange: #faa307;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-top: 0;
+            background: linear-gradient(135deg, var(--yellow), var(--peach));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.8;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            color: var(--mauve);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        @media (min-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 320px 1fr;
+            }
+        }
+
+        .controls {
+            background: #242532;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            height: fit-content;
+        }
+        .controls h3 {
+            margin: 0 0 5px 0;
+            color: var(--sky);
+        }
+
+        /* İKİ GRUP YAN YANA - KESİN SARMA YOK */
+        .controls-row {
+            display: flex;
+            gap: 15;
+            flex-wrap: nowrap;    /* kesinlikle sarma yok */
+            align-items: flex-end;
+        }
+        .controls-row .input-group {
+            flex: 0 0 auto;       /* sabit genişlik */
+            min-width: 150px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .input-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .value-badge {
+            background: #45475a;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            min-width: 70px;
+            text-align: center;
+            font-size: 2rem;      /* büyük font */
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .value-badge.base-badge {
+            color: var(--blue);
+            background: #1e2a3a;
+        }
+        .value-badge.exp-badge {
+            color: var(--orange);
+            background: #3a2e1e;
+        }
+
+        .step-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: center;
+        }
+        .step-btn {
+            background: transparent;
+            border: 2px solid #b1b1b1;
+            color: #b1b1b1;
+            width: 40px;
+            height: 34px;
+            border-radius: 6px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            line-height: 1;
+            user-select: none;
+            padding: 0;
+        }
+        .step-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .step-btn:active {
+            transform: scale(0.92);
+        }
+
+        .info-box {
+            background: #313244;
+            padding: 14px;
+            border-radius: 10px;
+            border-left: 4px solid var(--yellow);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-top: 5px;
+        }
+        .info-box strong {
+            color: var(--yellow);
+        }
+        .info-box ul {
+            margin: 8px 0 0 0;
+            padding-left: 18px;
+            opacity: 0.9;
+        }
+
+        .visual-area {
+            background: #1b1b24;
+            padding: 25px 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            min-height: 400px;
+        }
+        .visual-area h3 {
+            margin: 0 0 5px 0;
+            color: var(--sky);
+        }
+
+        .expression-display {
+            font-size: 2.8rem;
+            font-weight: bold;
+            background: #181825;
+            padding: 15px 30px;
+            border-radius: 16px;
+            border: 2px solid #45475a;
+            text-align: center;
+            width: 100%;
+        }
+        .expression-display .base {
+            color: var(--blue);
+        }
+        .expression-display .exp {
+            color: var(--orange);
+        }
+        .expression-display .result {
+            color: var(--green);
+        }
+
+        .expansion-area {
+            width: 100%;
+            background: #181825;
+            padding: 15px;
+            border-radius: 12px;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.2rem;
+        }
+        .expansion-area .tile {
+            width: 55px;
+            height: 55px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #111;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            background: var(--orange);
+            transition: background 0.3s;
+        }
+        .expansion-area .tile.negative {
+            background: var(--red);
+            color: #fff;
+        }
+        .expansion-area .op {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        .explanation-box {
+            width: 100%;
+            background: #181825;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            border-left: 4px solid var(--sky);
+            color: var(--text);
+        }
+        .explanation-box strong {
+            color: var(--yellow);
+        }
+
+        .btn-extra {
+            background: var(--blue);
+            border: none;
+            color: #111;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 5px;
+            align-self: flex-start;
+        }
+        .btn-extra:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px var(--blue);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .expression-display { font-size: 2rem; padding: 10px; }
+            .expansion-area .tile { width: 45px; height: 45px; font-size: 1.2rem; }
+            .step-btn { width: 36px; height: 30px; font-size: 1.2rem; }
+            .controls-row {
+                flex-wrap: wrap;    /* mobilde sarılabilir */
+                gap: 15px;
+            }
+            .controls-row .input-group {
+                min-width: 130px;
+                flex: 1 1 auto;
+            }
+            .value-badge {
+                font-size: 1.6rem;
+                min-width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚀 Üslü Sayı Simülasyonu</h1>
+
+    <div class="grid-2">
+        <!-- Kontroller -->
+        <div class="controls">
+            <h3>⚙️ Ayarlar</h3>
+            <div class="controls-row">
+                <div class="input-group">
+                    <label for="baseValueDisplay">Taban (a):</label>
+                    <div class="input-row">
+                        <span class="value-badge base-badge" id="baseValueDisplay">2</span>
+                        <div class="step-group">
+                            <button class="step-btn" id="baseUp" aria-label="Artır">▲</button>
+                            <button class="step-btn" id="baseDown" aria-label="Azalt">▼</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="expValueDisplay">Üs (n):</label>
+                    <div class="input-row">
+                        <span class="value-badge exp-badge" id="expValueDisplay">3</span>
+                        <div class="step-group">
+                            <button class="step-btn" id="expUp" aria-label="Artır">▲</button>
+                            <button class="step-btn" id="expDown" aria-label="Azalt">▼</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>📌 İpuçları:</strong>
+                <ul>
+                    <li>Negatif üs → <strong>kesir</strong> (ör. 2⁻¹ = ½) - <em>şimdilik sadece pozitif üs</em></li>
+                    <li>Sıfır üs → <strong>1</strong> (sıfır hariç)</li>
+                    <li>Sıfır taban → <strong>0</strong> (üs pozitifse)</li>
+                    <li>0⁰ → <strong>tanımsız</strong> (belirsiz)</li>
+                </ul>
+            </div>
+            <button class="btn-extra" onclick="rastgele()">🎲 Rastgele</button>
+        </div>
+
+        <!-- Görsel alan -->
+        <div class="visual-area">
+            <h3>📐 İfade ve Açılım</h3>
+
+            <div class="expression-display" id="expressionDisplay">
+                <span class="base" id="baseDisplay">2</span><sup class="exp" id="expDisplay">3</sup>
+                <span style="margin:0 15px; color:var(--text);">=</span>
+                <span class="result" id="resultDisplay">8</span>
+            </div>
+
+            <div class="expansion-area" id="expansionArea">
+                <span style="opacity:0.5;">← Değerleri değiştir</span>
+            </div>
+
+            <div class="explanation-box" id="explanationBox">
+                <strong>📖 Açıklama:</strong><br>
+                <span id="explanationText">2³ = 2 × 2 × 2 = 8</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        let base = 2;
+        let exp = 3;
+
+        const baseValueDisplay = document.getElementById('baseValueDisplay');
+        const expValueDisplay = document.getElementById('expValueDisplay');
+        const baseDisplay = document.getElementById('baseDisplay');
+        const expDisplay = document.getElementById('expDisplay');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const expansionArea = document.getElementById('expansionArea');
+        const explanationText = document.getElementById('explanationText');
+
+        const baseUp = document.getElementById('baseUp');
+        const baseDown = document.getElementById('baseDown');
+        const expUp = document.getElementById('expUp');
+        const expDown = document.getElementById('expDown');
+
+        const BASE_MIN = -10;
+        const BASE_MAX = 10;
+        const EXP_MIN = 0;
+        const EXP_MAX = 5;
+
+        function updateUI() {
+            baseValueDisplay.textContent = base;
+            expValueDisplay.textContent = exp;
+            baseDisplay.textContent = base;
+            expDisplay.textContent = exp;
+
+            if (base === 0 && exp === 0) {
+                resultDisplay.textContent = 'Tanımsız (0⁰)';
+                expansionArea.innerHTML = `<span style="color:var(--red); font-size:1.4rem;">⚠️ 0⁰ belirsizdir!</span>`;
+                explanationText.innerHTML = `
+                    <strong>0⁰</strong> ifadesi matematikte <span style="color:var(--red);">tanımsız</span> olarak kabul edilir.<br>
+                    Çünkü <em>0<sup>pozitif</sup> = 0</em> ve <em>(sıfırdan farklı)<sup>0</sup> = 1</em> çelişir.<br>
+                    Bu nedenle 0⁰ belirsizdir (genellikle tanımsız kabul edilir).
+                `;
+                return;
+            }
+
+            if (base === 0 && exp > 0) {
+                resultDisplay.textContent = '0';
+                expansionArea.innerHTML = `<span style="font-size:1.6rem; color:var(--orange);">0</span>`;
+                explanationText.innerHTML = `
+                    <strong>Sıfırın pozitif kuvvetleri:</strong> 0<sup>${exp}</sup> = 0<br>
+                    • Sıfırın her pozitif kuvveti sıfırdır.
+                `;
+                return;
+            }
+
+            if (exp > 0) {
+                const sonuc = Math.pow(base, exp);
+                resultDisplay.textContent = sonuc;
+
+                let carpanlar = [];
+                for (let i = 0; i < exp; i++) {
+                    carpanlar.push(base);
+                }
+
+                let tilesHtml = '';
+                carpanlar.forEach((val, idx) => {
+                    const tileClass = val < 0 ? 'tile negative' : 'tile';
+                    tilesHtml += `<div class="${tileClass}">${val}</div>`;
+                    if (idx < carpanlar.length - 1) {
+                        tilesHtml += `<span class="op">×</span>`;
+                    }
+                });
+                tilesHtml += `<span style="font-size:2rem; margin-left:10px;">=</span>`;
+                tilesHtml += `<span style="font-size:2.4rem; color:var(--green);">${sonuc}</span>`;
+
+                expansionArea.innerHTML = tilesHtml;
+
+                let carpanStr = carpanlar.join(' × ');
+                let signNote = '';
+                if (base < 0) {
+                    if (exp % 2 === 0) {
+                        signNote = `Çift sayıda negatif çarpım → sonuç <span style="color:var(--green);">pozitif</span>.`;
+                    } else {
+                        signNote = `Tek sayıda negatif çarpım → sonuç <span style="color:var(--red);">negatif</span>.`;
+                    }
+                }
+                explanationText.innerHTML = `
+                    <strong>Pozitif üs açılımı:</strong> ${base}<sup>${exp}</sup> = ${carpanStr}<br>
+                    • ${exp} tane ${base} çarpıldı. Sonuç: <strong>${sonuc}</strong><br>
+                    ${signNote ? '• ' + signNote : ''}
+                `;
+                return;
+            }
+
+            if (exp === 0 && base !== 0) {
+                resultDisplay.textContent = '1';
+                expansionArea.innerHTML = `<span style="font-size:1.8rem; color:var(--green);">1</span><span style="font-size:1rem; opacity:0.6; margin-left:10px;">(Boş çarpım, tanım gereği 1)</span>`;
+                explanationText.innerHTML = `
+                    <strong>Sıfırıncı kuvvet kuralı:</strong> Sıfırdan farklı her sayının <span style="color:var(--yellow);">0. kuvveti 1</span>'dir.<br>
+                    • ${base}<sup>0</sup> = 1 (çünkü hiç çarpım yapılmaz, boş çarpım 1'dir).
+                `;
+                return;
+            }
+        }
+
+        function changeBase(delta) {
+            const newVal = base + delta;
+            if (newVal >= BASE_MIN && newVal <= BASE_MAX) {
+                base = newVal;
+                updateUI();
+            }
+        }
+
+        function changeExp(delta) {
+            const newVal = exp + delta;
+            if (newVal >= EXP_MIN && newVal <= EXP_MAX) {
+                exp = newVal;
+                updateUI();
+            }
+        }
+
+        baseUp.addEventListener('click', () => changeBase(1));
+        baseDown.addEventListener('click', () => changeBase(-1));
+        expUp.addEventListener('click', () => changeExp(1));
+        expDown.addEventListener('click', () => changeExp(-1));
+
+        window.rastgele = function() {
+            base = Math.floor(Math.random() * (BASE_MAX - BASE_MIN + 1)) + BASE_MIN;
+            exp = Math.floor(Math.random() * (EXP_MAX - EXP_MIN + 1)) + EXP_MIN;
+            updateUI();
+        };
+
+        updateUI();
+    })();
+</script>
+
+</body>
+</html>

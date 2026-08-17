@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerçekçi Animasyonlu Havuz Motoru</title>
+    <style>
+        :root {
+            --bg: #1e1e2e; --surface: #2a2a35; --text: #cdd6f4;
+            --blue: #89b4fa; --water-flow: #74c7ec; --red: #f38ba8; --green: #a6e3a1;
+            --pipe: #b2bec3; --pipe-dark: #636e72;
+        }
+        body { font-family: system-ui; background: var(--bg); color: var(--text); padding: 20px; display: flex; gap: 20px; }
+        h2 { margin-top: 0; color: #fff; }
+        .panel { background: var(--surface); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .controls { flex: 1; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
+        .pool-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+        
+        .faucet-card { background: #313244; padding: 15px; border-radius: 8px; border-left: 4px solid var(--blue); position: relative;}
+        .faucet-card.drain { border-left-color: var(--red); }
+        .delete-btn { position: absolute; right: 10px; top: 10px; background: var(--red); border: none; color: white; border-radius: 4px; cursor: pointer;}
+        
+        .input-group { display: flex; justify-content: space-between; margin-top: 10px; font-size: 14px; align-items: center;}
+        .input-group input { background: #45475a; border: 1px solid #585b70; color: white; padding: 5px; border-radius: 4px; width: 80px;}
+        
+        .wizard-card { background: #313244; padding: 12px; border-radius: 8px; border: 1px dashed var(--blue); margin-top: 5px; }
+        .wizard-inputs { display: flex; gap: 5px; align-items: center; margin-top: 8px; font-size: 13px; }
+        .wizard-inputs input { background: #45475a; border: 1px solid #585b70; color: white; padding: 5px; border-radius: 4px; width: 60px; text-align: center; }
+
+        .btn { background: var(--blue); color: #111; font-weight: bold; padding: 10px; border: none; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 10px; transition: transform 0.1s;}
+        .btn:hover { opacity: 0.9; }
+        .btn:active { transform: scale(0.98); }
+        
+        /* Havuz Yapısı */
+        .pool-wrapper {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            margin-top: 50px;
+        }
+        #pool { 
+            position: absolute;
+            width: 100%; 
+            height: 100%; 
+            border: 8px solid #585b70; 
+            border-top: none; 
+            border-radius: 0 0 20px 20px; 
+            background: #181825; 
+            box-sizing: border-box;
+            overflow: hidden; 
+            z-index: 5;
+        }
+        #water { 
+            position: absolute; 
+            bottom: 0; 
+            width: 100%; 
+            height: 0%; 
+            background: rgba(137, 180, 250, 0.65); 
+            transition: height 0.1s linear; 
+            border-top: 3px solid #fff;
+            z-index: 6;
+        }
+
+        /* --- Musluk Tasarımları --- */
+        .visual-faucet {
+            position: absolute;
+            z-index: 10;
+            transition: top 0.3s;
+            width: 80px;  
+            height: 30px;
+        }
+        
+        .faucet-pipe { background: var(--pipe); position: absolute; border-radius: 4px; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2); height: 14px; top: 0; }
+        .faucet-spout { background: var(--pipe); position: absolute; border-radius: 0 0 4px 4px; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2); width: 16px; height: 20px; top: 10px; }
+        .faucet-valve { position: absolute; width: 16px; height: 16px; border-radius: 50%; top: -8px; border: 2px solid var(--pipe-dark); }
+        
+        .visual-fill { left: -30px; } 
+        .visual-fill .faucet-pipe { left: 0; width: 65px; } 
+        .visual-fill .faucet-spout { left: 45px; } 
+        .visual-fill .faucet-valve { left: 15px; background: var(--blue); }
+        .visual-fill .stream { left: 49px; height: 400px; } 
+
+        .visual-drain { right: -50px; } 
+        .visual-drain .faucet-pipe { left: 0; width: 65px; } 
+        .visual-drain .faucet-spout { left: 45px; } 
+        .visual-drain .faucet-valve { left: 20px; background: var(--red); }
+        .visual-drain .stream { left: 49px; height: 200px; } 
+
+        @keyframes flow-down {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 20px; }
+        }
+        
+        .stream {
+            position: absolute;
+            width: 8px;
+            background: repeating-linear-gradient(to bottom, var(--water-flow) 0px, var(--water-flow) 10px, transparent 10px, transparent 20px);
+            animation: flow-down 0.3s linear infinite;
+            display: none; 
+            opacity: 0.85;
+            border-radius: 4px;
+            z-index: 4;
+        }
+
+        .visual-faucet.is-flowing .stream { display: block; }
+
+        #logBoard { width: 100%; height: 150px; background: #11111b; font-family: monospace; padding: 10px; overflow-y: auto; border-radius: 8px; margin-top: 20px; box-sizing: border-box; font-size: 12px;}
+        .log-entry { margin-bottom: 5px; }
+        .log-time { color: var(--green); }
+    </style>
+</head>
+<body>
+
+<div class="controls panel">
+    <h2>⚙️ Parametreler</h2>
+    
+    <div class="input-group">
+        <label>Havuz Toplam Hacmi (Litre)</label>
+        <input type="number" id="poolCapacity" value="1200" oninput="syncInputs('capacity')">
+    </div>
+
+    <div class="input-group">
+        <label>Başlangıç Doluluğu (%)</label>
+        <input type="number" id="initialPercent" value="0" min="0" max="100" step="1" oninput="syncInputs('percent')">
+    </div>
+    <div class="input-group">
+        <label>Başlangıç Miktarı (Litre)</label>
+        <input type="number" id="initialVolume" value="0" min="0" oninput="syncInputs('volume')">
+    </div>
+
+    <div class="wizard-card">
+        <strong style="color: var(--blue); font-size: 14px;">Kapasite Hesaplama Yardımcısı</strong>
+        <div class="wizard-inputs">
+            <span>%</span>
+            <input type="number" id="wizardPercent" value="75" min="1" max="100">
+            <span>'i</span>
+            <input type="number" id="wizardLitres" value="800" min="1">
+            <span>Litre ise</span>
+            <button class="btn" style="margin: 0; padding: 5px 10px; font-size: 12px; width: auto;" onclick="applyWizard()">Hesapla ve Uygula</button>
+        </div>
+    </div>
+    
+    <hr style="border-color: #45475a; margin: 15px 0;">
+    
+    <div id="faucetList"></div>
+    
+    <button class="btn" style="background: #a6e3a1;" onclick="addFaucet('fill')">+ Dolduran Musluk Ekle</button>
+    <button class="btn" style="background: #f38ba8;" onclick="addFaucet('drain')">+ Boşaltan Musluk Ekle</button>
+    
+    <hr style="border-color: #45475a; margin: 15px 0;">
+    
+    <div style="display: flex; gap: 10px;">
+        <button class="btn" onclick="startSimulation()">▶ Simülasyonu Başlat</button>
+        <button class="btn" style="background: #f9e2af;" onclick="resetSimulation()">🔄 Sıfırla</button>
+    </div>
+</div>
+
+<div class="pool-area panel">
+    <h2 id="timeDisplay">00:00</h2>
+    <div style="font-weight: bold; color: var(--blue);" id="volumeDisplay">0 / 1200 L (%0)</div>
+    
+    <div class="pool-wrapper">
+        <div id="pool">
+            <div id="water"></div>
+        </div>
+    </div>
+
+    <div id="logBoard"></div>
+</div>
+
+<script>
+    let faucets = [];
+    let faucetIdCounter = 0;
+    
+    let currentVolume = 0;
+    let currentMinute = 0;
+    let poolCapacity = 1200;
+    let timer = null;
+    let isRunning = false;
+
+    // Varsayılan Kurulum
+    addFaucet('fill', 200, 0, 100); 
+    addFaucet('drain', 100, 0, 50);
+    resetSimulation();
+
+    // Giriş alanlarını dinamik olarak senkronize eden fonksiyon
+    function syncInputs(trigger) {
+        poolCapacity = parseFloat(document.getElementById('poolCapacity').value) || 0;
+        let initialPercentEl = document.getElementById('initialPercent');
+        let initialVolumeEl = document.getElementById('initialVolume');
+
+        if (poolCapacity <= 0) return;
+
+        if (trigger === 'percent') {
+            let pct = parseFloat(initialPercentEl.value) || 0;
+            if (pct > 100) { pct = 100; initialPercentEl.value = 100; }
+            if (pct < 0) { pct = 0; initialPercentEl.value = 0; }
+            initialVolumeEl.value = Math.round((poolCapacity * pct) / 100);
+        } else if (trigger === 'volume' || trigger === 'capacity') {
+            let vol = parseFloat(initialVolumeEl.value) || 0;
+            if (vol > poolCapacity) { vol = poolCapacity; initialVolumeEl.value = poolCapacity; }
+            if (vol < 0) { vol = 0; initialVolumeEl.value = 0; }
+            initialPercentEl.value = ((vol / poolCapacity) * 100).toFixed(1);
+        }
+        
+        if (!isRunning) {
+            currentVolume = parseFloat(initialVolumeEl.value) || 0;
+            updateUI();
+        }
+    }
+
+    // Sihirbaz fonksiyonu (%75'i 800L ise vb.)
+    function applyWizard() {
+        const wp = parseFloat(document.getElementById('wizardPercent').value) || 0;
+        const wl = parseFloat(document.getElementById('wizardLitres').value) || 0;
+
+        if (wp <= 0 || wl <= 0) {
+            alert("Lütfen geçerli yüzde ve litre değerleri girin.");
+            return;
+        }
+
+        // Toplam kapasiteyi hesapla (Örn: 800 / 75 * 100)
+        const calculatedCapacity = Math.round((wl / wp) * 100);
+        
+        // Değerleri ana giriş kutularına aktar
+        document.getElementById('poolCapacity').value = calculatedCapacity;
+        document.getElementById('initialPercent').value = wp;
+        document.getElementById('initialVolume').value = wl;
+        
+        poolCapacity = calculatedCapacity;
+        currentVolume = wl;
+
+        resetSimulation();
+        log(`Sihirbaz uygulandı: Havuz Kapasitesi ${calculatedCapacity}L olarak ayarlandı ve %${wp} (${wl}L) dolulukla başlatıldı.`);
+    }
+
+    function addFaucet(type, defaultRate = 100, defaultStart = 0, defaultHeight = type === 'fill' ? 100 : 0) {
+        const id = faucetIdCounter++;
+        faucets.push({ id, type, rate: defaultRate, startHour: defaultStart, heightPercent: defaultHeight, isFlowing: false });
+        renderFaucets();
+        drawFaucetsOnPool();
+    }
+
+    function removeFaucet(id) {
+        faucets = faucets.filter(f => f.id !== id);
+        renderFaucets();
+        drawFaucetsOnPool();
+    }
+
+    function updateFaucet(id, field, value) {
+        const faucet = faucets.find(f => f.id === id);
+        if (faucet) {
+            faucet[field] = parseFloat(value) || 0;
+            drawFaucetsOnPool();
+        }
+    }
+
+    function renderFaucets() {
+        const list = document.getElementById('faucetList');
+        list.innerHTML = '';
+        faucets.forEach((f, index) => {
+            const isDrain = f.type === 'drain';
+            list.innerHTML += `
+                <div class="faucet-card ${isDrain ? 'drain' : ''}">
+                    <button class="delete-btn" onclick="removeFaucet(${f.id})">X</button>
+                    <strong>Musluk ${index + 1} (${isDrain ? 'Boşaltan' : 'Dolduran'})</strong>
+                    <div class="input-group">
+                        <label>Hız (L/Saat):</label>
+                        <input type="number" value="${f.rate}" onchange="updateFaucet(${f.id}, 'rate', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Gecikme (Saat):</label>
+                        <input type="number" value="${f.startHour}" step="0.5" onchange="updateFaucet(${f.id}, 'startHour', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Konum (Yükseklik %):</label>
+                        <input type="number" value="${f.heightPercent}" min="0" max="100" onchange="updateFaucet(${f.id}, 'heightPercent', this.value)">
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function drawFaucetsOnPool() {
+        const wrapper = document.querySelector('.pool-wrapper');
+        document.querySelectorAll('.visual-faucet').forEach(el => el.remove());
+        
+        faucets.forEach(f => {
+            const el = document.createElement('div');
+            el.className = `visual-faucet ${f.type === 'fill' ? 'visual-fill' : 'visual-drain'}`;
+            el.id = `faucet-visual-${f.id}`;
+            el.style.top = `calc(${100 - f.heightPercent}% - 10px)`; 
+            
+            el.innerHTML = `
+                <div class="faucet-pipe"></div>
+                <div class="faucet-valve"></div>
+                <div class="faucet-spout"></div>
+                <div class="stream"></div>
+            `;
+            wrapper.appendChild(el);
+        });
+    }
+
+    function log(message) {
+        const board = document.getElementById('logBoard');
+        const h = Math.floor(currentMinute / 60).toString().padStart(2, '0');
+        const m = (currentMinute % 60).toString().padStart(2, '0');
+        board.innerHTML += `<div class="log-entry"><span class="log-time">[${h}:${m}]</span> ${message}</div>`;
+        board.scrollTop = board.scrollHeight;
+    }
+
+    function resetSimulation() {
+        clearInterval(timer);
+        isRunning = false;
+        currentMinute = 0;
+        document.getElementById('logBoard').innerHTML = '';
+        
+        poolCapacity = parseFloat(document.getElementById('poolCapacity').value) || 1200;
+        currentVolume = parseFloat(document.getElementById('initialVolume').value) || 0;
+        
+        if (currentVolume > poolCapacity) currentVolume = poolCapacity;
+
+        stopFaucets();
+        updateUI();
+        log("Simülasyon sıfırlandı. Başlangıç hacmi: " + currentVolume.toFixed(1) + " L");
+    }
+
+    function startSimulation() {
+        if (isRunning) return;
+        poolCapacity = parseFloat(document.getElementById('poolCapacity').value) || 1200;
+        log("Simülasyon başladı. Havuz kapasitesi: " + poolCapacity + " L");
+        isRunning = true;
+        timer = setInterval(() => { step(); }, 20); 
+    }
+
+    function step() {
+        let netRatePerMinute = 0;
+        const currentHeightPercent = (currentVolume / poolCapacity) * 100;
+        const currentHour = currentMinute / 60;
+
+        faucets.forEach(f => {
+            const ratePerMinute = f.rate / 60;
+            let shouldFlow = false;
+
+            if (currentHour >= f.startHour) {
+                if (f.type === 'fill' && currentVolume < poolCapacity) {
+                    netRatePerMinute += ratePerMinute;
+                    shouldFlow = true;
+                } 
+                else if (f.type === 'drain' && currentHeightPercent > f.heightPercent && currentVolume > 0) {
+                    netRatePerMinute -= ratePerMinute;
+                    shouldFlow = true;
+                }
+            }
+
+            if (f.isFlowing !== shouldFlow) {
+                f.isFlowing = shouldFlow;
+                const visualEl = document.getElementById(`faucet-visual-${f.id}`);
+                if (visualEl) {
+                    if (shouldFlow) visualEl.classList.add('is-flowing');
+                    else visualEl.classList.remove('is-flowing');
+                }
+            }
+        });
+
+        let prevVolume = currentVolume;
+        currentVolume += netRatePerMinute;
+
+        if (currentVolume >= poolCapacity) {
+            currentVolume = poolCapacity;
+            if (prevVolume < poolCapacity) {
+                log(`Havuz tamamen doldu!`);
+                stopFaucets();
+                clearInterval(timer);
+                isRunning = false;
+            }
+        } else if (currentVolume <= 0 && currentMinute > 0) {
+            currentVolume = 0;
+            if (prevVolume > 0) {
+                log(`Havuz tamamen boşaldı!`);
+                stopFaucets();
+                clearInterval(timer);
+                isRunning = false;
+            }
+        }
+
+        currentMinute++;
+        updateUI();
+    }
+    
+    function stopFaucets() {
+        faucets.forEach(f => {
+            f.isFlowing = false;
+            const visualEl = document.getElementById(`faucet-visual-${f.id}`);
+            if (visualEl) visualEl.classList.remove('is-flowing');
+        });
+    }
+
+    function updateUI() {
+        const h = Math.floor(currentMinute / 60).toString().padStart(2, '0');
+        const m = (currentMinute % 60).toString().padStart(2, '0');
+        document.getElementById('timeDisplay').innerText = `${h}:${m}`;
+        
+        const percent = poolCapacity > 0 ? ((currentVolume / poolCapacity) * 100).toFixed(1) : 0;
+        document.getElementById('volumeDisplay').innerText = `${currentVolume.toFixed(1)} / ${poolCapacity} L (%${percent})`;
+        document.getElementById('water').style.height = `${percent}%`;
+    }
+
+    drawFaucetsOnPool();
+</script>
+</body>
+</html>

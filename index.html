@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ortaokul Ders Materyalleri</title>
+    <style>
+        /* Sizin belirlediğiniz renk şeması (Design Tokens) */
+        :root {
+            --bg: #0d0e15;
+            --surface: #161626;
+            --surface-card: #1f1f33;
+            --text: #cdd6f4;
+            --text-dim: #a6adc8;
+            --blue: #89b4fa;
+            --mauve: #cba6f7;
+            --radius: 16px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --transition: 0.3s ease;
+        }
+
+        /* Genel sayfa ayarları */
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            height: 100vh; 
+            overflow: hidden; 
+            background: var(--bg); /* Ana arka plan */
+            color: var(--text);
+        }
+
+        /* Yüzen Menü Butonu */
+        .floating-menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--surface-card);
+            color: var(--mauve);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 900; 
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px); /* Üzerine gelince hafif yukarı kalkma efekti */
+            color: var(--blue);
+        }
+
+        /* Yan Menü (Sidebar) Ayarları */
+        #sidebar {
+            position: fixed; 
+            top: 0; 
+            left: -320px; /* Başlangıçta gizli */
+            width: 300px; 
+            height: 100%;
+            background: var(--surface); 
+            box-shadow: 10px 0 30px rgba(0,0,0,0.6);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            transition: left var(--transition); 
+            padding-top: 80px; 
+            z-index: 1000; 
+            overflow-y: auto;
+        }
+
+        #sidebar.open { left: 0; }
+
+        #sidebar a {
+            display: block; 
+            padding: 16px 28px; 
+            color: var(--text-dim); 
+            text-decoration: none; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        #sidebar a:hover { 
+            background: var(--surface-card); 
+            color: var(--blue);
+            padding-left: 36px; 
+            border-left: 4px solid var(--blue); /* Hover durumunda sol tarafta şık bir çizgi */
+        }
+
+        .close-btn { 
+            position: absolute; 
+            top: 20px; 
+            right: 25px; 
+            font-size: 32px; 
+            cursor: pointer; 
+            background: none; 
+            border: none; 
+            color: var(--text-dim);
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: var(--mauve);
+            transform: scale(1.1);
+        }
+
+        /* İçeriğin Gösterileceği Alan (Iframe) */
+        #contentFrame { 
+            width: 100%; 
+            height: 100vh; 
+            border: none; 
+            display: block;
+            background: var(--bg); /* İframe arkasını da ana renkle doldurduk */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Yüzen Buton -->
+    <button class="floating-menu-btn" onclick="toggleSidebar()">☰</button>
+
+    <!-- Yan Menü -->
+    <div id="sidebar">
+        <button class="close-btn" onclick="toggleSidebar()">×</button>
+        
+        <a href="mat_Sayi_Dogrusu-toplacikar.html" target="contentArea" onclick="toggleSidebar()">Topla Çıkar</a>
+        <a href="mat_üslü_sayilar.html" target="contentArea" onclick="toggleSidebar()">Üslü Sayılar</a>
+        <a href="mat_Kesirler.html" target="contentArea" onclick="toggleSidebar()">Kesirler</a>
+        <a href="mat_ EBOB ve EKOK.html" target="contentArea" onclick="toggleSidebar()">EBOB EKOK</a>
+        <a href="mat_karekök_ayiklama.html" target="contentArea" onclick="toggleSidebar()">Karekök Ayıklama</a>
+        <a href="mat_karakök_oranOranti.html" target="contentArea" onclick="toggleSidebar()">Karekök Oran</a>
+
+        <a href="mat_alan_modeli_ozdeslik.html" target="contentArea" onclick="toggleSidebar()">Özdeşlik</a>
+        <a href="mat_Cebirsel İfadeler.html" target="contentArea" onclick="toggleSidebar()">Cebirsel İfadeler</a>
+        <a href="mat_havuz problemleri+.html" target="contentArea" onclick="toggleSidebar()">Havuz Problemleri</a>        
+        
+        <a href="mat_oran.html" target="contentArea" onclick="toggleSidebar()">ORAN</a>
+        
+        
+        
+    </div>
+
+    <!-- İlgili HTML dosyalarının gösterileceği alan -->
+    <iframe name="contentArea" id="contentFrame" src="matematik.html"></iframe>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("open");
+        }
+    </script>
+</body>
+</html>

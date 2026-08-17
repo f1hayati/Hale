@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧮 6. Sınıf Cebirsel İfadeler Dünyası</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --primary: #38bdf8;
+            --secondary: #818cf8;
+            --accent-green: #4ade80;
+            --accent-yellow: #facc15;
+            --accent-orange: #fb923c;
+            --accent-pink: #f472b6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 25px 15px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Navigasyon Sekmeleri */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+            background: rgba(0,0,0,0.25);
+            padding: 6px;
+            border-radius: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 18px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #0f172a;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* GRID DÜZENLERİ */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .panel {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* INPUT VE BUTONLAR */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .expr-input {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 1.6rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            color: var(--accent-yellow);
+            text-align: center;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .expr-input:focus {
+            border-color: var(--primary);
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .preset-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+
+        .preset-btn:hover {
+            background: var(--primary);
+            color: #0f172a;
+        }
+
+        .action-btn {
+            background: var(--primary);
+            color: #0f172a;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .secondary-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .secondary-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* SLIDER VE ROZET ALANI */
+        .slider-box {
+            background: var(--bg-input);
+            padding: 15px 20px;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .x-badge {
+            background: var(--accent-orange);
+            color: #0f172a;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: inline-block;
+            line-height: 1.2;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #475569;
+            accent-color: var(--accent-orange);
+            cursor: pointer;
+        }
+
+        /* KİMLİK KARTI */
+        .anatomy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .anatomy-item {
+            background: var(--bg-input);
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .anatomy-item.green { border-color: var(--accent-green); }
+        .anatomy-item.yellow { border-color: var(--accent-yellow); }
+        .anatomy-item.pink { border-color: var(--accent-pink); }
+
+        .anatomy-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .anatomy-val {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        /* ADIM ADIM ÇÖZÜM */
+        .solution-step {
+            background: var(--bg-input);
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .math-code {
+            font-family: monospace;
+            font-size: 1.5rem;
+            color: var(--primary);
+            background: rgba(0,0,0,0.35);
+            padding: 8px 14px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(56, 189, 248, 0.15));
+            border: 2px solid var(--accent-green);
+            padding: 18px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .result-title {
+            font-size: 0.95rem;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .result-val {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        /* SÖZEL CÜMLE RASTGELE KARTLAR VE REHBER */
+        .tag-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            background: rgba(56, 189, 248, 0.2);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .guide-item {
+            background: var(--bg-input);
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guide-sentence {
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .guide-algebra {
+            font-family: monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-yellow);
+            background: rgba(0,0,0,0.25);
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        /* QUIZ */
+        .quiz-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 20px;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .quiz-q {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .quiz-opt {
+            background: var(--bg-input);
+            border: 2px solid var(--border-color);
+            padding: 14px;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .quiz-opt:hover {
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .quiz-feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        @media (max-width: 850px) {
+            .grid-2col { grid-template-columns: 1fr; }
+            .quiz-options { grid-template-columns: 1fr; }
+            .tab-nav { flex-direction: column; }
+            header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>🧮 6. Sınıf Cebirsel İfadeler Dünyası</h1>
+    </header>
+
+    <!-- Navigasyon Sekmeleri -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('lab')">🧪 Cebir Laboratuvarı</button>
+        <button class="tab-btn" onclick="switchTab('verbal')">🎲 Sözel Cümle Soru Pratiği</button>
+        <button class="tab-btn" onclick="switchTab('quiz')">🎯 Test (Quiz)</button>
+    </div>
+
+    <!-- SEKME 1: CEBİR LABORATUVARI -->
+    <div id="tab-lab" class="tab-content active">
+        <div class="grid-2col">
+            <!-- Sol Panel: İfade Oluşturucu -->
+            <div class="panel">
+                <div class="panel-title">✏️ İfade Oluşturucu</div>
+                
+                <div class="input-group">
+                    <label for="exprInput">Cebirsel İfadeyi Girin:</label>
+                    <input type="text" id="exprInput" class="expr-input" value="3x + 5" placeholder="Örn: 2x + 4">
+                </div>
+
+                <div class="input-group">
+                    <label>MEB Müfredatına Uygun Örnekler:</label>
+                    <div class="presets">
+                        <button class="preset-btn" onclick="setPreset('2x + 4')">2x + 4</button>
+                        <button class="preset-btn" onclick="setPreset('4x - 3')">4x - 3</button>
+                        <button class="preset-btn" onclick="setPreset('x + 7')">x + 7</button>
+                        <button class="preset-btn" onclick="setPreset('5x')">5x</button>
+                        <button class="preset-btn" onclick="setPreset('12 - 2x')">12 - 2x</button>
+                    </div>
+                </div>
+
+                <div class="slider-box">
+                    <div class="slider-header">
+                        <span>Değişken Değeri (x):</span>
+                        <span class="x-badge" id="xBadge">2</span>
+                    </div>
+                    <input type="range" id="xSlider" min="0" max="15" value="2" step="1">
+                </div>
+
+                <div class="panel-title" style="margin-top: 10px;">📋 Cebirsel İfadenin Elemanları</div>
+                <div class="anatomy-grid">
+                    <div class="anatomy-item">
+                        <div class="anatomy-label">Değişken (Bilinmeyen)</div>
+                        <div class="anatomy-val" id="anaVar">x</div>
+                    </div>
+                    <div class="anatomy-item green">
+                        <div class="anatomy-label">Terimler</div>
+                        <div class="anatomy-val" id="anaTerms">3x, 5</div>
+                    </div>
+                    <div class="anatomy-item yellow">
+                        <div class="anatomy-label">Katsayılar</div>
+                        <div class="anatomy-val" id="anaCoefs">3, 5</div>
+                    </div>
+                    <div class="anatomy-item pink">
+                        <div class="anatomy-label">Sabit Terim</div>
+                        <div class="anatomy-val" id="anaConst">5</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Panel: Adım Adım Çözüm -->
+            <div class="panel">
+                <div class="panel-title">⚙️ Adım Adım Değer Hesaplama</div>
+                
+                <div id="solutionSteps">
+                    <!-- JS ile dinamik doldurulacak -->
+                </div>
+
+                <div class="result-box">
+                    <div class="result-title">HESAPLANAN SONUÇ</div>
+                    <div class="result-val" id="finalResult">11</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEKME 2: SÖZEL CÜMLE RASTGELE SORU VE PRATİK MANTIĞI -->
+    <div id="tab-verbal" class="tab-content">
+        <div class="grid-2col">
+            
+            <!-- SOL PANEL: MEB Müfredat Sözel Kalıplar Rehberi -->
+            <div class="panel">
+                <div class="panel-title">📚 Tüm 6. Sınıf Sözel Kalıpları</div>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Sınavlarda karşına çıkabilecek tüm sözel ifade tipleri ve matematiksel karşılıkları:</p>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div class="guide-item">
+                        <div class="guide-sentence">Bir sayının <strong>5 katı</strong></div>
+                        <div class="guide-algebra">5x</div>
+                    </div>
+                    <div class="guide-item">
+                        <div class="guide-sentence">Bir sayının <strong>7 fazlası</strong></div>
+                        <div class="guide-algebra">x + 7</div>
+                    </div>
+                    <div class="guide-item">
+                        <div class="guide-sentence">Bir sayının <strong>3 katının 2 eksiği</strong></div>
+                        <div class="guide-algebra">3x - 2</div>
+                    </div>
+                    <div class="guide-item">
+                        <div class="guide-sentence">Bir sayının <strong>4 eksiğinin 2 katı</strong></div>
+                        <div class="guide-algebra">2 · (x - 4)</div>
+                    </div>
+                    <div class="guide-item">
+                        <div class="guide-sentence">Bir sayının <strong>yarısı</strong></div>
+                        <div class="guide-algebra">x / 2</div>
+                    </div>
+                    <div class="guide-item">
+                        <div class="guide-sentence">Bir sayının <strong>yarısının 3 fazlası</strong></div>
+                        <div class="guide-algebra">(x / 2) + 3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAĞ PANEL: Rastgele Soru Motoru (İnteraktif Pratik) -->
+            <div class="panel">
+                <div class="panel-title">🎲 Rastgele Sözel Cümle Sorusu</div>
+                
+                <div>
+                    <span id="randomTag" class="tag-badge">⚡ Katı & Fazlası</span>
+                </div>
+
+                <div style="background: var(--bg-input); padding: 22px; border-radius: 16px; border-left: 4px solid var(--accent-yellow);">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Soru Cümlesi:</div>
+                    <div id="randomSentence" style="font-size: 1.35rem; font-weight: bold; color: var(--text-main); line-height: 1.4;">
+                        Bir sayının 4 katının 3 fazlası
+                    </div>
+                </div>
+
+                <!-- Sesli söyleme yönlendirmesi -->
+                <div style="background: rgba(255, 255, 255, 0.03); padding: 14px; border-radius: 12px; border: 1px dashed var(--border-color); text-align: center; color: var(--text-muted); font-size: 0.95rem; line-height: 1.4;">
+                    🗣️ Cevabı zihninden veya sesli olarak söyle, ardından butonlara basarak cevabını kontrol et!
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: auto;">
+                    <button class="action-btn" style="flex: 1;" onclick="toggleAnswerBox()">👁️ Cevabı Göster / Gizle</button>
+                    <button class="secondary-btn" style="flex: 1;" onclick="generateRandomVerbalQuestion()">🔄 Başka Soru Sor</button>
+                </div>
+
+                <!-- Cevap Açıklama Kutusu -->
+                <div id="answerBox" style="display: none; background: rgba(74, 222, 128, 0.1); border: 2px solid var(--accent-green); padding: 18px; border-radius: 14px; margin-top: 5px;">
+                    <div style="font-size: 0.9rem; color: var(--accent-green); font-weight: bold; margin-bottom: 4px;">DOĞRU CEVAP:</div>
+                    <div id="correctAlgebra" style="font-size: 1.8rem; font-weight: bold; color: var(--accent-yellow); font-family: monospace;">4x + 3</div>
+                    <div id="answerExplanation" style="font-size: 0.95rem; color: var(--text-main); margin-top: 8px; line-height: 1.4;">
+                        Önce sayının 4 katı alındı (4x), ardından 3 eklendi (+ 3).
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SEKME 3: MİNİ QUIZ -->
+    <div id="tab-quiz" class="tab-content">
+        <div class="quiz-card">
+            <div class="panel-title" style="margin-bottom: 15px;">🎯 Kendini Test Et (MEB Sınav Tarzı)</div>
+            <div class="quiz-q" id="quizQuestion">Soru yükleniyor...</div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <div class="quiz-feedback" id="quizFeedback"></div>
+            <button class="preset-btn" id="nextBtn" style="display:none; margin-top:15px; width:100%; padding:12px; background:var(--primary); color:#0f172a; font-weight:bold;" onclick="loadNextQuestion()">Sıradaki Soruya Geç ➔</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- SEKME DEĞİŞTİRME MEKANİZMASI ---
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    // --- CEBİRSEL İFADE PARSER ---
+    const exprInput = document.getElementById('exprInput');
+    const xSlider = document.getElementById('xSlider');
+    const xBadge = document.getElementById('xBadge');
+
+    function setPreset(val) {
+        exprInput.value = val;
+        updateAll();
+    }
+
+    function parseAlgebra(expr) {
+        let clean = expr.replace(/\s+/g, '').toLowerCase();
+        
+        let coef = 0;
+        let constant = 0;
+        let variable = 'x';
+        let constantFirst = false;
+
+        let varMatch = clean.match(/[a-z]/);
+        if (varMatch) variable = varMatch[0];
+
+        if (!clean.includes(variable)) {
+            constant = parseInt(clean) || 0;
+            coef = 0;
+        } else {
+            let terms = clean.match(/[+-]?[^+-]+/g) || [];
+            
+            if (terms.length > 0 && !terms[0].includes(variable)) {
+                constantFirst = true;
+            }
+
+            terms.forEach(term => {
+                if (term.includes(variable)) {
+                    let cStr = term.replace(variable, '');
+                    if (cStr === '' || cStr === '+') coef = 1;
+                    else if (cStr === '-') coef = -1;
+                    else coef = parseInt(cStr);
+                } else {
+                    constant = parseInt(term);
+                }
+            });
+        }
+
+        return {
+            coef: isNaN(coef) ? 0 : coef,
+            constant: isNaN(constant) ? 0 : constant,
+            variable: variable,
+            constantFirst: constantFirst
+        };
+    }
+
+    function updateAll() {
+        const expr = exprInput.value;
+        const xVal = parseInt(xSlider.value);
+        xBadge.textContent = xVal;
+
+        const parsed = parseAlgebra(expr);
+
+        // Kimlik Kartını Güncelle
+        document.getElementById('anaVar').textContent = parsed.variable;
+        
+        let terms = [];
+        if (parsed.constantFirst) {
+            if (parsed.constant !== 0) terms.push(`${parsed.constant}`);
+            if (parsed.coef !== 0) terms.push(`${parsed.coef > 0 ? '+' : ''}${parsed.coef !== 1 ? (parsed.coef === -1 ? '-' : parsed.coef) : ''}${parsed.variable}`);
+        } else {
+            if (parsed.coef !== 0) terms.push(`${parsed.coef !== 1 ? (parsed.coef === -1 ? '-' : parsed.coef) : ''}${parsed.variable}`);
+            if (parsed.constant !== 0) terms.push(parsed.constant > 0 ? `+${parsed.constant}` : `${parsed.constant}`);
+        }
+        if (terms.length === 0) terms.push('0');
+
+        document.getElementById('anaTerms').textContent = terms.join(', ');
+
+        let coefs = [];
+        if (parsed.constantFirst) {
+            if (parsed.constant !== 0) coefs.push(parsed.constant);
+            if (parsed.coef !== 0) coefs.push(parsed.coef);
+        } else {
+            if (parsed.coef !== 0) coefs.push(parsed.coef);
+            if (parsed.constant !== 0) coefs.push(parsed.constant);
+        }
+        document.getElementById('anaCoefs').textContent = coefs.join(', ');
+
+        document.getElementById('anaConst').textContent = parsed.constant;
+
+        // Adım Adım Çözüm (Parantezsiz ve Turuncu x-badge ile)
+        const stepsContainer = document.getElementById('solutionSteps');
+        const finalVal = (parsed.coef * xVal) + parsed.constant;
+
+        const xHighlighted = `<span class="x-badge">${xVal}</span>`;
+
+        let step1HTML = '';
+        let step2HTML = '';
+
+        if (parsed.coef !== 0) {
+            if (parsed.constantFirst) {
+                let signSymbol = parsed.coef > 0 ? '+' : '-';
+                let absCoef = Math.abs(parsed.coef);
+                let coefStr = absCoef === 1 ? '' : `${absCoef} · `;
+
+                step1HTML = `
+                    <div class="solution-step">
+                        <strong>1. Adım:</strong> Harfin (${parsed.variable}) yerine ${xHighlighted} yazılır.
+                        <br><span class="math-code">${parsed.constant} ${signSymbol} ${coefStr}${xHighlighted}</span>
+                    </div>
+                `;
+
+                let multResult = absCoef * xVal;
+                step2HTML = `
+                    <div class="solution-step">
+                        <strong>2. Adım:</strong> İşlem önceliğine göre önce çarpma yapılır.
+                        <br><span class="math-code">${parsed.constant} ${signSymbol} ${multResult}</span>
+                    </div>
+                `;
+            } else {
+                let constPart = '';
+                if (parsed.constant !== 0) {
+                    constPart = parsed.constant > 0 ? ` + ${parsed.constant}` : ` - ${Math.abs(parsed.constant)}`;
+                }
+
+                let coefStr = parsed.coef === 1 ? '' : (parsed.coef === -1 ? '-' : `${parsed.coef} · `);
+
+                step1HTML = `
+                    <div class="solution-step">
+                        <strong>1. Adım:</strong> Harfin (${parsed.variable}) yerine ${xHighlighted} yazılır.
+                        <br><span class="math-code">${coefStr}${xHighlighted}${constPart}</span>
+                    </div>
+                `;
+
+                let multResult = parsed.coef * xVal;
+                step2HTML = `
+                    <div class="solution-step">
+                        <strong>2. Adım:</strong> İşlem önceliğine göre önce çarpma yapılır.
+                        <br><span class="math-code">${multResult}${constPart}</span>
+                    </div>
+                `;
+            }
+        } else {
+            step1HTML = `
+                <div class="solution-step">
+                    <strong>1. Adım:</strong> İfadede değişken yoktur, sabit değer geçerlidir.
+                    <br><span class="math-code">${parsed.constant}</span>
+                </div>
+            `;
+        }
+
+        stepsContainer.innerHTML = step1HTML + step2HTML;
+        document.getElementById('finalResult').textContent = finalVal;
+    }
+
+    exprInput.addEventListener('input', updateAll);
+    xSlider.addEventListener('input', updateAll);
+
+    // --- RASTGELE SÖZEL SORU JENERATÖRÜ (2. SEKME) ---
+    function generateRandomVerbalQuestion() {
+        const types = ['kat_fazla', 'parantez', 'sadece_kat', 'sadece_ekle', 'kesirli', 'kesirli_ekle'];
+        const selectedType = types[Math.floor(Math.random() * types.length)];
+        
+        const kat = Math.floor(Math.random() * 8) + 2;
+        const miktar = Math.floor(Math.random() * 12) + 1;
+        const islem = Math.random() > 0.5 ? '+' : '-';
+        const islemText = islem === '+' ? 'fazlası' : 'eksiği';
+
+        let sentence = "";
+        let algebra = "";
+        let tag = "";
+        let explanation = "";
+
+        if (selectedType === 'kat_fazla') {
+            tag = "⚡ Katı & Fazlası / Eksiği";
+            sentence = `Bir sayının ${kat} katının ${miktar} ${islemText}`;
+            algebra = `${kat}x ${islem} ${miktar}`;
+            explanation = `Önce sayının ${kat} katı yazılır (${kat}x), ardından ${miktar} ${islemText} eklenir (${islem} ${miktar}).`;
+        } 
+        else if (selectedType === 'parantez') {
+            tag = "📦 Parantezli İşlem Sırası";
+            sentence = `Bir sayının ${miktar} ${islemText}nin ${kat} katı`;
+            algebra = `${kat} · (x ${islem} ${miktar})`;
+            explanation = `Sözcük sırasında önce toplama/çıkarma dendiği için parantez içine alınır: (x ${islem} ${miktar}). Sonra tamamı ${kat} ile çarpılır.`;
+        } 
+        else if (selectedType === 'sadece_kat') {
+            tag = "✖️ Sadece Katı";
+            sentence = `Bir sayının ${kat} katı`;
+            algebra = `${kat}x`;
+            explanation = `Bilinmeyen sayı x olsun, ${kat} katı doğrudan ${kat}x olarak ifade edilir.`;
+        } 
+        else if (selectedType === 'sadece_ekle') {
+            tag = "➕ Sadece Fazlası / Eksiği";
+            sentence = `Bir sayının ${miktar} ${islemText}`;
+            algebra = `x ${islem} ${miktar}`;
+            explanation = `Bilinmeyen sayı x'e doğrudan ${miktar} eklenir/çıkarılır.`;
+        }
+        else if (selectedType === 'kesirli') {
+            tag = "🍕 Bölüm / Kesir";
+            const kesirTipleri = [
+                { s: "Bir sayının yarısı", a: "x / 2", exp: "Yarısı demek 2'ye bölmek demektir: x / 2" },
+                { s: "Bir sayının çeyreği", a: "x / 4", exp: "Çeyreği demek 4'e bölmek demektir: x / 4" },
+                { s: "Bir sayının üçte biri", a: "x / 3", exp: "Üçte biri demek 3'e bölmek demektir: x / 3" }
+            ];
+            const chosen = kesirTipleri[Math.floor(Math.random() * kesirTipleri.length)];
+            sentence = chosen.s;
+            algebra = chosen.a;
+            explanation = chosen.exp;
+        }
+        else if (selectedType === 'kesirli_ekle') {
+            tag = "🍕 Kesir & İşlem";
+            sentence = `Bir sayının yarısının ${miktar} ${islemText}`;
+            algebra = `(x / 2) ${islem} ${miktar}`;
+            explanation = `Önce yarısı ifade edilir (x / 2), ardından ${miktar} ${islemText} eklenir.`;
+        }
+
+        document.getElementById('randomTag').textContent = tag;
+        document.getElementById('randomSentence').textContent = sentence;
+        document.getElementById('correctAlgebra').textContent = algebra;
+        document.getElementById('answerExplanation').textContent = explanation;
+
+        // Cevap kutusunu gizle
+        document.getElementById('answerBox').style.display = 'none';
+    }
+
+    function toggleAnswerBox() {
+        const box = document.getElementById('answerBox');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // --- QUIZ VERİSİ VE MANTIĞI (3. SEKME) ---
+    const quizQuestions = [
+        {
+            q: "<strong>3x - 4</strong> cebirsel ifadesinin <strong>x = 5</strong> için değeri kaçtır?",
+            opts: ["11", "15", "19", "7"],
+            ans: 0
+        },
+        {
+            q: "<strong>4a + 2b - 9</strong> cebirsel ifadesinin <u>sabit terimi</u> nedir?",
+            opts: ["4", "2", "-9", "9"],
+            ans: 2
+        },
+        {
+            q: "<em>'Bir sayının 3 eksiğinin 2 katı'</em> cümlesinin cebirsel ifadesi hangisidir?",
+            opts: ["2x - 3", "3x - 2", "2 · (x - 3)", "x - 6"],
+            ans: 2
+        },
+        {
+            q: "<strong>2x + 7</strong> ifadesinin katsayıları toplamı kaçtır?",
+            opts: ["2", "7", "9", "14"],
+            ans: 2
+        }
+    ];
+
+    let currentQ = 0;
+
+    function loadQuestion() {
+        const q = quizQuestions[currentQ];
+        document.getElementById('quizQuestion').innerHTML = `${currentQ + 1}. ${q.q}`;
+        const optsContainer = document.getElementById('quizOptions');
+        optsContainer.innerHTML = '';
+        
+        const feedback = document.getElementById('quizFeedback');
+        feedback.style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+
+        q.opts.forEach((opt, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'quiz-opt';
+            btn.innerHTML = opt;
+            btn.onclick = () => checkAnswer(idx);
+            optsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(chosenIdx) {
+        const q = quizQuestions[currentQ];
+        const feedback = document.getElementById('quizFeedback');
+        feedback.style.display = 'block';
+
+        if (chosenIdx === q.ans) {
+            feedback.style.background = 'rgba(74, 222, 128, 0.2)';
+            feedback.style.color = 'var(--accent-green)';
+            feedback.innerHTML = "🎉 Tebrikler! Doğru cevap.";
+        } else {
+            feedback.style.background = 'rgba(244, 114, 182, 0.2)';
+            feedback.style.color = 'var(--accent-pink)';
+            feedback.innerHTML = `❌ Üzgünüm, yanlış. Doğru cevap: <strong>${q.opts[q.ans]}</strong>`;
+        }
+
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function loadNextQuestion() {
+        currentQ = (currentQ + 1) % quizQuestions.length;
+        loadQuestion();
+    }
+
+    // Başlangıç yüklemeleri
+    updateAll();
+    generateRandomVerbalQuestion();
+    loadQuestion();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Alan Modeli ile Özdeşlik</title>
+<style>
+    :root {
+        --bg: #1e1e2e; --surface: #2a2a35; --text: #cdd6f4;
+        --blue: #89b4fa; --green: #a6e3a1; --red: #f38ba8; --yellow: #f9e2af;
+        --mauve: #cba6f7; --pipe-dark: #636e72;
+    }
+    body { font-family: system-ui; background: var(--bg); color: var(--text); padding: 20px; display: flex; gap: 30px; flex-wrap: wrap; }
+    h2 { margin-top: 0; color: #fff; font-size: 28px; text-align: center; }
+    
+    /* BÜYÜTÜLDÜ: Kontrol Paneli Genişliği */
+    .panel { background: var(--surface); padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+    .controls { flex: 1; min-width: 400px; max-width: 550px; display: flex; flex-direction: column; gap: 20px; }
+    
+    .stage-area { flex: 2; min-width: 450px; min-height: 650px; display: flex; flex-direction: column; align-items: center; }
+
+    .mode-switch { display: flex; gap: 12px; }
+    /* BÜYÜTÜLDÜ: Mod Seçim Butonları */
+    .mode-btn { flex: 1; background: #313244; color: var(--text); border: 2px solid #45475a; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 18px; transition: all 0.15s; }
+    .mode-btn.active { border-color: var(--blue); background: #3a3f58; color: #fff; }
+
+    /* BÜYÜTÜLDÜ: Giriş Alanları ve Slider */
+    .input-group { display: flex; justify-content: space-between; margin-top: 10px; font-size: 18px; align-items: center; gap: 15px;}
+    .input-group label { width: 140px; font-weight: bold; }
+    .input-group input[type=range] { flex: 1; accent-color: var(--blue); height: 8px; cursor: pointer; }
+    .val-badge { background: #45475a; padding: 8px 16px; border-radius: 8px; min-width: 40px; text-align: center; font-weight: bold; font-size: 22px; color: var(--blue); }
+
+    /* YENİ: Tablet İçin Hassas Ayar Butonları */
+    .step-btn {
+        background: #45475a; border: none; color: var(--text); font-size: 18px; padding: 10px 18px;
+        border-radius: 8px; cursor: pointer; transition: transform 0.1s, background 0.2s;
+        user-select: none; touch-action: manipulation; display: flex; align-items: center; justify-content: center;
+    }
+    .step-btn:active { background: #585b70; transform: scale(0.92); }
+
+    /* BÜYÜTÜLDÜ: Formül Kartı */
+    .formula-card { background: #313244; padding: 20px; border-radius: 10px; border-left: 5px solid var(--yellow); font-size: 26px; text-align: center; line-height: 1.8; }
+    .formula-card .step { color: var(--text); opacity: 0.7; font-size: 20px; }
+    .formula-card .final { color: var(--yellow); font-weight: bold; font-size: 30px; }
+
+    /* BÜYÜTÜLDÜ: Alt Bilgi (Lejant) */
+    .legend { display: flex; flex-direction: column; gap: 12px; font-size: 18px; background: #242532; padding: 20px; border-radius: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 12px; }
+    .legend-swatch { width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2); }
+
+    /* BÜYÜTÜLDÜ: Bilgi / Log Panosu */
+    #logBoard { 
+        width: 100%; max-width: 550px; min-height: 100px; background: #1b1b24; padding: 20px; 
+        border-radius: 10px; margin-top: 15px; box-sizing: border-box; font-size: 20px; 
+        line-height: 1.6; border-left: 5px solid var(--green); display: flex; align-items: center;
+    }
+    .log-entry { color: #e0e0e6; }
+    .log-entry strong { color: var(--green); }
+
+    #square-wrapper { position: relative; margin-top: 60px; margin-left: 60px; margin-bottom: 50px; transition: width 0.3s ease, height 0.3s ease; }
+    
+    /* BÜYÜTÜLDÜ: Kutu İçindeki Yazılar */
+    .region { position: absolute; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 22px; transition: all 0.3s ease; }
+    .region span { text-align: center; line-height: 1.4; }
+    
+    .region.aa { background: var(--blue); color: #111; border: 2px solid var(--bg); }
+    .region.bb { background: var(--red); color: #111; border: 2px solid var(--bg); }
+    .region.ab { background: var(--green); color: #111; border: 2px solid var(--bg); }
+
+    .region.target-area { background: var(--blue); color: #111; border: 2px solid var(--bg); box-shadow: 0 0 15px rgba(137, 180, 250, 0.4); z-index: 2; }
+    .region.cut-out { background: repeating-linear-gradient(45deg, rgba(243, 139, 168, 0.15), rgba(243, 139, 168, 0.15) 10px, rgba(243, 139, 168, 0.3) 10px, rgba(243, 139, 168, 0.3) 20px); border: 3px dashed #f38ba8; color: #f38ba8; }
+    .region.cut-out-corner { background: repeating-linear-gradient(-45deg, rgba(243, 139, 168, 0.2), rgba(243, 139, 168, 0.2) 10px, rgba(243, 139, 168, 0.4) 10px, rgba(243, 139, 168, 0.4) 20px); border: 3px dashed #f38ba8; color: #f38ba8; }
+
+    /* BÜYÜTÜLDÜ: Dış Ölçü Çizgileri ve Yazıları */
+    .brace { position: absolute; font-size: 20px; color: var(--text); font-weight: bold; white-space: nowrap; }
+    #braceTop { top: -40px; left: 50%; transform: translateX(-50%); color: var(--mauve); }
+    #braceLeft { top: 50%; left: -40px; transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl; color: var(--mauve); }
+</style>
+</head>
+<body>
+
+<div class="controls panel">
+    <h2>🧩 Alan Modeli ile Özdeşlik</h2>
+
+    <div class="mode-switch">
+        <button class="mode-btn active" id="btnPlus" onclick="setMode('plus')">Toplama (a + b)²</button>
+        <button class="mode-btn" id="btnMinus" onclick="setMode('minus')">Çıkarma (a − b)²</button>
+    </div>
+
+    <!-- Tablet Uyumlu 'a' Değeri Kontrolü -->
+    <div class="input-group">
+        <label id="labelA">a (1. parça)</label>
+        <button class="step-btn" onclick="stepSlider('sliderA', -1)">◀</button>
+        <input type="range" id="sliderA" min="1" max="9" value="5" oninput="update()">
+        <button class="step-btn" onclick="stepSlider('sliderA', 1)">▶</button>
+        <span class="val-badge" id="valA">5</span>
+    </div>
+
+    <!-- Tablet Uyumlu 'b' Değeri Kontrolü -->
+    <div class="input-group">
+        <label id="labelB">b (2. parça)</label>
+        <button class="step-btn" onclick="stepSlider('sliderB', -1)">◀</button>
+        <input type="range" id="sliderB" min="1" max="9" value="3" oninput="update()">
+        <button class="step-btn" onclick="stepSlider('sliderB', 1)">▶</button>
+        <span class="val-badge" id="valB">3</span>
+    </div>
+
+    <div class="formula-card" id="formulaCard">
+        <div class="step" id="stepLine"></div>
+        <div class="final" id="finalLine"></div>
+    </div>
+
+    <div class="legend" id="legendBox"></div>
+
+    <div id="logBoard"></div>
+</div>
+
+<div class="stage-area panel">
+    <h2 id="title">(a + b)² = a² + 2ab + b²</h2>
+    <div id="square-wrapper">
+        <div class="brace" id="braceTop"></div>
+        <div class="brace" id="braceLeft"></div>
+        <div class="region" id="reg1"><span></span></div>
+        <div class="region" id="reg2"><span></span></div>
+        <div class="region" id="reg3"><span></span></div>
+        <div class="region" id="reg4"><span></span></div>
+    </div>
+</div>
+
+<script>
+    let mode = 'plus';
+    let lastLog = '';
+
+    function log(msg) {
+        if (msg === lastLog) return;
+        lastLog = msg;
+        const board = document.getElementById('logBoard');
+        board.innerHTML = `<div class="log-entry">💡 ${msg}</div>`;
+    }
+
+    function setMode(m) {
+        mode = m;
+        document.getElementById('btnPlus').classList.toggle('active', m === 'plus');
+        document.getElementById('btnMinus').classList.toggle('active', m === 'minus');
+        
+        document.getElementById('labelA').innerText = m === 'plus' ? 'a (1. parça)' : 'a (Tüm kenar)';
+        document.getElementById('labelB').innerText = m === 'plus' ? 'b (2. parça)' : 'b (Kesilen kısım)';
+
+        const sliderA = document.getElementById('sliderA');
+        const sliderB = document.getElementById('sliderB');
+        if (m === 'minus' && parseInt(sliderB.value) >= parseInt(sliderA.value)) {
+            sliderB.value = Math.max(1, parseInt(sliderA.value) - 1);
+        }
+        update();
+    }
+
+    // YENİ: Butonlarla hassas artırma ve azaltma fonksiyonu
+    function stepSlider(id, delta) {
+        const slider = document.getElementById(id);
+        let val = parseInt(slider.value) || 0;
+        let min = parseInt(slider.min) || 1;
+        let max = parseInt(slider.max) || 9;
+        
+        val += delta;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        
+        slider.value = val;
+        update(); // Değer değişince sahneyi güncelle
+    }
+
+    function update() {
+        let a = parseInt(document.getElementById('sliderA').value);
+        let b = parseInt(document.getElementById('sliderB').value);
+
+        // BÜYÜTÜLDÜ: Karelerin birim büyüklüğü artırıldı (plus modu 30, minus modu 60 oldu)
+        const UNIT = (mode === 'plus') ? 30 : 60;
+
+        if (mode === 'minus') {
+            document.getElementById('sliderB').max = a - 1;
+            if (b >= a) { b = a - 1; document.getElementById('sliderB').value = b; }
+        } else {
+            document.getElementById('sliderB').max = 9;
+        }
+
+        document.getElementById('valA').innerText = a;
+        document.getElementById('valB').innerText = b;
+
+        const wrapper = document.getElementById('square-wrapper');
+        const reg1 = document.getElementById('reg1');
+        const reg2 = document.getElementById('reg2');
+        const reg3 = document.getElementById('reg3');
+        const reg4 = document.getElementById('reg4');
+        const legendBox = document.getElementById('legendBox');
+
+        if (mode === 'plus') {
+            const side = a + b;
+            wrapper.style.width = side * UNIT + 'px';
+            wrapper.style.height = side * UNIT + 'px';
+
+            document.getElementById('braceTop').innerText = `a + b = ${side}`;
+            document.getElementById('braceLeft').innerText = `a + b = ${side}`;
+
+            reg1.className = 'region aa'; reg2.className = 'region ab';
+            reg3.className = 'region ab'; reg4.className = 'region bb';
+
+            reg1.style.left = '0px'; reg1.style.top = '0px';
+            reg1.style.width = a * UNIT + 'px'; reg1.style.height = a * UNIT + 'px';
+            reg1.querySelector('span').innerHTML = `a²`;
+
+            reg2.style.left = a * UNIT + 'px'; reg2.style.top = '0px';
+            reg2.style.width = b * UNIT + 'px'; reg2.style.height = a * UNIT + 'px';
+            reg2.querySelector('span').innerHTML = `ab`;
+
+            reg3.style.left = '0px'; reg3.style.top = a * UNIT + 'px';
+            reg3.style.width = a * UNIT + 'px'; reg3.style.height = b * UNIT + 'px';
+            reg3.querySelector('span').innerHTML = `ab`;
+
+            reg4.style.left = a * UNIT + 'px'; reg4.style.top = a * UNIT + 'px';
+            reg4.style.width = b * UNIT + 'px'; reg4.style.height = b * UNIT + 'px';
+            reg4.querySelector('span').innerHTML = `b²`;
+
+            const aa = a*a, ab = a*b, bb = b*b, total = side*side;
+            document.getElementById('title').innerText = `(a + b)² = a² + 2ab + b²`;
+            document.getElementById('stepLine').innerText = `(${a} + ${b})² = ${a}² + 2·${a}·${b} + ${b}²`;
+            document.getElementById('finalLine').innerText = `= ${aa} + ${2*ab} + ${bb} = ${total}`;
+
+            legendBox.innerHTML = `
+                <div class="legend-item"><div class="legend-swatch" style="background:var(--blue)"></div><span>a × a = <strong>a²</strong> (${aa})</span></div>
+                <div class="legend-item"><div class="legend-swatch" style="background:var(--green)"></div><span>2 adet a × b = <strong>2ab</strong> (${2*ab})</span></div>
+                <div class="legend-item"><div class="legend-swatch" style="background:var(--red)"></div><span>b × b = <strong>b²</strong> (${bb})</span></div>
+            `;
+
+            log(`Kenarı <strong>(${a}+${b})</strong> olan büyük karenin alanı, içindeki 4 küçük alanın toplamına eşittir: <strong>a² + ab + ab + b²</strong>`);
+        } 
+        else {
+            const x = a - b, y = b, side = a;
+            wrapper.style.width = side * UNIT + 'px';
+            wrapper.style.height = side * UNIT + 'px';
+
+            document.getElementById('braceTop').innerText = `Tüm Kenar = a (${side})`;
+            document.getElementById('braceLeft').innerText = `Tüm Kenar = a (${side})`;
+
+            reg1.className = 'region target-area'; 
+            reg2.className = 'region cut-out';
+            reg3.className = 'region cut-out'; 
+            reg4.className = 'region cut-out-corner';
+
+            reg1.style.left = '0px'; reg1.style.top = '0px';
+            reg1.style.width = x * UNIT + 'px'; reg1.style.height = x * UNIT + 'px';
+            reg1.querySelector('span').innerHTML = `Hedef<br>(a−b)²`;
+
+            reg2.style.left = x * UNIT + 'px'; reg2.style.top = '0px';
+            reg2.style.width = y * UNIT + 'px'; reg2.style.height = x * UNIT + 'px';
+            reg2.querySelector('span').innerHTML = `Kesilen`;
+
+            reg3.style.left = '0px'; reg3.style.top = x * UNIT + 'px';
+            reg3.style.width = x * UNIT + 'px'; reg3.style.height = y * UNIT + 'px';
+            reg3.querySelector('span').innerHTML = `Kesilen`;
+
+            reg4.style.left = x * UNIT + 'px'; reg4.style.top = x * UNIT + 'px';
+            reg4.style.width = y * UNIT + 'px'; reg4.style.height = y * UNIT + 'px';
+            reg4.querySelector('span').innerHTML = `Köşe<br>b²`;
+
+            const target = x*x, total = side*side;
+            document.getElementById('title').innerText = `(a − b)² = a² − 2ab + b²`;
+            
+            document.getElementById('stepLine').innerHTML = `(${a}−${b})² = ${a}² − 2·${a}·${b} + ${b}²`;
+            document.getElementById('finalLine').innerText = `= ${total} − ${2*a*b} + ${b*b} = ${target}`;
+
+            legendBox.innerHTML = `
+                <div class="legend-item"><div class="legend-swatch" style="background:var(--blue); box-shadow: 0 0 5px var(--blue)"></div><span><strong>Kalan Hedef Alan:</strong> (a−b)² = ${target}</span></div>
+                <div class="legend-item"><div class="legend-swatch" style="background:repeating-linear-gradient(45deg, #f38ba8, #f38ba8 4px, transparent 4px, transparent 8px); border: 2px dashed #f38ba8"></div><span><strong>Çıkarılan Parçalar:</strong> Taralı Alanlar</span></div>
+            `;
+
+            log(`Tüm alan <strong>a² (${total})</strong>. İki tane <strong>a×b (${a*b})</strong> dikdörtgeni çıkardığımızda, sağ alttaki <strong>b² (${b*b})</strong> alanını iki kere çıkarmış oluruz. Dengelemek için bir tane <strong>+b²</strong> ekleriz.`);
+        }
+    }
+
+    setMode('plus');
+</script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎯 Tam Sayılarda Yön ve İşaret Dünyası (-15 ile +15)</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --input-bg: #334155;
+            --primary: #38bdf8;
+            --pos: #4ade80;
+            --neg: #f472b6;
+            --warn: #facc15;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 15px;
+        }
+
+        /* 1550px Genişletilmiş Konteyner */
+        .container {
+            width: 100%;
+            max-width: 1550px;
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.6rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        /* 4 ALTIN KURAL KARTLARI (SADELEŞTİRİLDİ) */
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .rule-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid var(--border);
+            padding: 22px 20px;
+            border-radius: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .rule-card:hover {
+            border-color: var(--primary);
+        }
+
+        .rule-card h4 {
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+
+        /* KUTUCUK İÇİ SADE VE NET KURAL VURGUSU */
+        .rule-card code {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--warn);
+            background: var(--input-bg);
+            padding: 10px 22px;
+            border-radius: 14px;
+            letter-spacing: 2px;
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            width: 100%;
+            display: inline-block;
+        }
+
+        /* KART İÇİNDEKİ CANLI ÖRNEK BUTONU */
+        .rule-btn {
+            width: 100%;
+            background: var(--input-bg);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+
+        .rule-btn:active, .rule-btn:hover {
+            background: var(--primary);
+            color: #0f172a;
+        }
+
+        /* KONTROL ALANI */
+        .controls-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 22px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .num-picker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-width: 150px;
+        }
+
+        .num-picker-label {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .num-display {
+            font-size: 2.8rem;
+            font-weight: bold;
+            font-family: monospace;
+            background: var(--input-bg);
+            color: var(--warn);
+            width: 130px;
+            height: 75px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* SOLA VE SAĞA BAKAN ÜÇGEN BUTONLAR */
+        .triangle-btn-group {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .triangle-btn {
+            width: 60px;
+            height: 52px;
+            background: var(--input-bg);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            color: var(--primary);
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            touch-action: manipulation;
+        }
+
+        .triangle-btn:active {
+            background: var(--primary);
+            color: #0f172a;
+            transform: scale(0.92);
+        }
+
+        /* İŞLEM SEÇİCİ */
+        .op-picker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .op-toggle-btn {
+            width: 85px;
+            height: 75px;
+            background: var(--input-bg);
+            border: 3px solid var(--primary);
+            border-radius: 18px;
+            color: var(--primary);
+            font-size: 2.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: all 0.2s;
+        }
+
+        .op-toggle-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* ORTA HESAPLAMA & DÖNÜŞÜM AÇIKLAMA KUTUSU */
+        .formula-box {
+            background: rgba(15, 23, 42, 0.7);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 22px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .expression {
+            font-size: 2.4rem;
+            font-weight: bold;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .transformation {
+            font-size: 1.7rem;
+            font-weight: bold;
+            color: var(--warn);
+            background: var(--input-bg);
+            padding: 8px 24px;
+            border-radius: 14px;
+            border: 1px dashed var(--warn);
+        }
+
+        .rule-explain {
+            font-size: 1.3rem;
+            color: var(--pos);
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        /* SAYI DOĞRUSU ALANI (-15 ile +15) */
+        .number-line-container {
+            background: var(--input-bg);
+            border-radius: 22px;
+            padding: 65px 25px 30px 25px;
+            position: relative;
+            margin-top: 15px;
+        }
+
+        .line {
+            height: 4px;
+            background: var(--border);
+            width: 100%;
+            position: relative;
+        }
+
+        .ticks-container {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            width: 100%;
+            top: -6px;
+            left: 0;
+            padding: 0 12px;
+        }
+
+        .tick {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 0;
+        }
+
+        .tick-mark {
+            width: 2px;
+            height: 18px;
+            background: var(--border);
+        }
+
+        .tick-mark.zero {
+            background: var(--warn);
+            width: 4px;
+            height: 26px;
+        }
+
+        .tick-label {
+            font-size: 0.95rem;
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .tick-label.zero {
+            color: var(--warn);
+            font-size: 1.2rem;
+        }
+
+        /* JUMPER (ZIPLAYAN HAREKETLİ TOP) */
+        .jumper {
+            width: 52px;
+            height: 52px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            top: -68px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.45rem;
+            color: #0f172a;
+            box-shadow: 0 0 25px var(--primary);
+            z-index: 10;
+        }
+
+        @media (max-width: 900px) {
+            .tick-label { font-size: 0.8rem; }
+        }
+        @media (max-width: 600px) {
+            .controls-grid { flex-direction: column; }
+            .expression { font-size: 1.8rem; }
+            .transformation { font-size: 1.3rem; }
+            .tick-label { display: none; }
+            .tick-label:nth-child(5n+1) { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+   
+
+    <!-- FORMÜLSÜZ VE AÇIKLAMA METİNSİZ, SADECE DOKUNULABİLİR KURAL KARTLARI -->
+    <div class="rules-grid">
+        <div class="rule-card">
+            <h4>İki Eksi Yan Yana</h4>
+            <code>- - ➔ +</code>
+            <button class="rule-btn" onclick="setEquation(5, '-', -2)">Dene: 5 - (-2)</button>
+        </div>
+        <div class="rule-card">
+            <h4>Artı - Eksi Yan Yana</h4>
+            <code>+ - ➔ -</code>
+            <button class="rule-btn" onclick="setEquation(5, '+', -2)">Dene: 5 + (-2)</button>
+        </div>
+        <div class="rule-card">
+            <h4>Eksi - Artı Yan Yana</h4>
+            <code>- + ➔ -</code>
+            <button class="rule-btn" onclick="setEquation(5, '-', 2)">Dene: 5 - 2</button>
+        </div>
+        <div class="rule-card">
+            <h4>İki Artı Yan Yana</h4>
+            <code>+ + ➔ +</code>
+            <button class="rule-btn" onclick="setEquation(5, '+', 2)">Dene: 5 + 2</button>
+        </div>
+    </div>
+
+    <!-- TABLET UYUMLU KONTROL PANELİ -->
+    <div class="controls-grid">
+        <!-- 1. SAYI PANELİ -->
+        <div class="num-picker">
+            <span class="num-picker-label">1. Sayı</span>
+            <div class="num-display" id="valA">5</div>
+            <div class="triangle-btn-group">
+                <button class="triangle-btn" onclick="changeVal('A', -1)" aria-label="1. Sayıyı Azalt">◀</button>
+                <button class="triangle-btn" onclick="changeVal('A', 1)" aria-label="1. Sayıyı Artır">▶</button>
+            </div>
+        </div>
+
+        <!-- İŞLEM DEĞİŞTİRİCİ -->
+        <div class="op-picker">
+            <span class="num-picker-label">İşlem</span>
+            <button class="op-toggle-btn" id="opBtn" onclick="toggleOp()">−</button>
+        </div>
+
+        <!-- 2. SAYI PANELİ -->
+        <div class="num-picker">
+            <span class="num-picker-label">2. Sayı</span>
+            <div class="num-display" id="valB">-2</div>
+            <div class="triangle-btn-group">
+                <button class="triangle-btn" onclick="changeVal('B', -1)" aria-label="2. Sayıyı Azalt">◀</button>
+                <button class="triangle-btn" onclick="changeVal('B', 1)" aria-label="2. Sayıyı Artır">▶</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HESAPLAMA VE SADELEŞTİRME AÇIKLAMA KUTUSU -->
+    <div class="formula-box">
+        <div class="expression" id="exprDisplay">5 - (-2)</div>
+        <div class="transformation" id="transDisplay">Sadeleşmiş Hali: 5 + 2 = 7</div>
+        <div class="rule-explain" id="explainDisplay">💡 - - yan yana ise + olur! İşlem: 5 + 2</div>
+    </div>
+
+    <!-- SAYI DOĞRUSU (-15 ile +15) -->
+    <div class="number-line-container">
+        <div class="jumper" id="jumper">7</div>
+        <div class="line"></div>
+        <div class="ticks-container" id="ticks"></div>
+    </div>
+</div>
+
+<script>
+    const MIN = -15;
+    const MAX = 15;
+
+    let stateA = 5;
+    let stateB = -2;
+    let currentOp = '-';
+
+    const valAEl = document.getElementById('valA');
+    const valBEl = document.getElementById('valB');
+    const opBtn = document.getElementById('opBtn');
+    
+    const exprDisplay = document.getElementById('exprDisplay');
+    const transDisplay = document.getElementById('transDisplay');
+    const explainDisplay = document.getElementById('explainDisplay');
+    const jumper = document.getElementById('jumper');
+    const ticksContainer = document.getElementById('ticks');
+
+    function buildNumberLine() {
+        ticksContainer.innerHTML = '';
+        for (let i = MIN; i <= MAX; i++) {
+            const tick = document.createElement('div');
+            tick.className = 'tick';
+            
+            const mark = document.createElement('div');
+            mark.className = 'tick-mark' + (i === 0 ? ' zero' : '');
+            
+            const label = document.createElement('div');
+            label.className = 'tick-label' + (i === 0 ? ' zero' : '');
+            label.textContent = i;
+            
+            tick.appendChild(mark);
+            tick.appendChild(label);
+            ticksContainer.appendChild(tick);
+        }
+    }
+
+    function changeVal(target, delta) {
+        if (target === 'A') {
+            stateA = Math.max(MIN, Math.min(MAX, stateA + delta));
+            valAEl.textContent = stateA;
+        } else {
+            stateB = Math.max(MIN, Math.min(MAX, stateB + delta));
+            valBEl.textContent = stateB;
+        }
+        updateUI();
+    }
+
+    function toggleOp() {
+        currentOp = currentOp === '-' ? '+' : '-';
+        opBtn.textContent = currentOp;
+        updateUI();
+    }
+
+    function setEquation(a, operator, b) {
+        stateA = a;
+        stateB = b;
+        currentOp = operator;
+        
+        valAEl.textContent = stateA;
+        valBEl.textContent = stateB;
+        opBtn.textContent = currentOp;
+        
+        updateUI();
+    }
+
+    function updateUI() {
+        const a = stateA;
+        const b = stateB;
+        const operator = currentOp;
+
+        const bSignedStr = b < 0 ? `(${b})` : `${b}`;
+        exprDisplay.textContent = `${a} ${operator} ${bSignedStr}`;
+
+        let netShift = 0;
+        let transText = "";
+        let explanation = "";
+
+        if (operator === '-') {
+            if (b < 0) {
+                netShift = Math.abs(b);
+                transText = `Sadeleşmiş Hali: ${a} + ${Math.abs(b)}`;
+                explanation = `💡 - - yan yana ise + olur! İşlem: ${a} + ${Math.abs(b)}`;
+            } else {
+                netShift = -b;
+                transText = `Sadeleşmiş Hali: ${a} - ${b}`;
+                explanation = `💡 - + yan yana ise - olur! İşlem: ${a} - ${b}`;
+            }
+        } else { // operator === '+'
+            if (b < 0) {
+                netShift = b;
+                transText = `Sadeleşmiş Hali: ${a} - ${Math.abs(b)}`;
+                explanation = `💡 + - yan yana ise - olur! İşlem: ${a} - ${Math.abs(b)}`;
+            } else {
+                netShift = b;
+                transText = `Sadeleşmiş Hali: ${a} + ${b}`;
+                explanation = `💡 + + yan yana ise + olur! İşlem: ${a} + ${b}`;
+            }
+        }
+
+        const result = a + netShift;
+        transDisplay.textContent = `${transText} = ${result}`;
+        explainDisplay.textContent = explanation;
+
+        const clampedResult = Math.max(MIN, Math.min(MAX, result));
+        const totalRange = MAX - MIN;
+        const percentage = ((clampedResult - MIN) / totalRange) * 100;
+
+        jumper.style.left = `${percentage}%`;
+        jumper.textContent = result;
+    }
+
+    buildNumberLine();
+    updateUI();
+</script>
+
+</body>
+</html>

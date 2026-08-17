@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📐 Oran-Orantı ile Karekök Tahmini</title>
+    <style>
+        :root {
+            --bg: #1e1e2e;
+            --surface: #2a2a35;
+            --text: #cdd6f4;
+            --blue: #89b4fa;
+            --green: #a6e3a1;
+            --red: #f38ba8;
+            --yellow: #f9e2af;
+            --mauve: #cba6f7;
+            --peach: #fab387;
+            --sky: #74c7ec;
+            --font-lg: 1.25rem;
+            --font-xl: 1.6rem;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            font-size: 1.1rem;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.6rem;
+            margin-top: 0;
+            background: linear-gradient(135deg, var(--yellow), var(--peach));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.9;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: var(--mauve);
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        @media (min-width: 820px) {
+            .grid-2 {
+                grid-template-columns: 340px 1fr;
+            }
+        }
+        .controls {
+            background: #242532;
+            padding: 24px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: fit-content;
+        }
+        .controls h3 {
+            margin: 0 0 8px 0;
+            color: var(--sky);
+            font-size: 1.5rem;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .input-group label {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .input-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--blue);
+            cursor: pointer;
+            height: 8px;
+        }
+        .badge {
+            background: #45475a;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-weight: bold;
+            min-width: 50px;
+            text-align: center;
+            color: var(--blue);
+            font-size: 1.4rem;
+        }
+        .info-box {
+            background: #313244;
+            padding: 18px;
+            border-radius: 14px;
+            border-left: 6px solid var(--yellow);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-top: 4px;
+        }
+        .info-box strong {
+            color: var(--yellow);
+        }
+        .btn-extra {
+            background: var(--blue);
+            border: none;
+            color: #111;
+            font-weight: bold;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            align-self: flex-start;
+        }
+        .btn-extra:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 20px var(--blue);
+        }
+        .btn-extra.green {
+            background: var(--green);
+        }
+
+        /* ---------- YENİ STEP BUTONLARI ---------- */
+        .step-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 6px;
+        }
+        .btn-step {
+            background: var(--blue);
+            border: none;
+            color: #111;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: all 0.2s;
+            flex: 1;
+            max-width: 80px;
+            line-height: 1.2;
+        }
+        .btn-step:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--blue);
+        }
+
+        /* ---------- GÖRSEL ALAN ---------- */
+        .visual-area {
+            background: #1b1b24;
+            padding: 28px 20px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            min-height: 450px;
+            width: 100%;
+        }
+        .visual-area h3 {
+            margin: 0 0 4px 0;
+            color: var(--sky);
+            font-size: 1.6rem;
+        }
+
+        /* ---------- SAYI DOĞRUSU + CETVEL ---------- */
+        .axis-container {
+            width: 96%;
+            position: relative;
+            height: 210px;
+            margin: 10px 0 15px 0;
+        }
+        .axis-line {
+            width: 100%;
+            height: 5px;
+            background: var(--text);
+            position: absolute;
+            top: 28%;
+            transform: translateY(-50%);
+            border-radius: 6px;
+        }
+
+        /* CETVEL ÇİZGİLERİ - sayı doğrusunun ALTINDA */
+        .scale-ticks {
+            position: absolute;
+            top: 72%;
+            left: 10%;
+            width: 80%;
+            height: 60px;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .tick-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .tick-mark {
+            width: 3px;
+            height: 38px;
+            background: #6c7086;
+            transition: background 0.3s;
+            border-radius: 3px;
+        }
+        .tick-mark.highlight-tick {
+            background: var(--yellow);
+            box-shadow: 0 0 14px var(--yellow);
+            width: 4px;
+        }
+        .tick-label {
+            font-size: 1rem;
+            color: var(--text);
+            opacity: 0.9;
+            font-weight: bold;
+            margin-top: 4px;
+            background: rgba(0,0,0,0.4);
+            padding: 0 6px;
+            border-radius: 6px;
+        }
+
+        /* Uç noktalar (tam kareler) - sayı doğrusu hizasında */
+        .axis-point {
+            position: absolute;
+            top: 28%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 3;
+        }
+        .axis-point .dot {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            border: 3px solid var(--blue);
+            box-shadow: 0 0 12px rgba(137, 180, 250, 0.4);
+        }
+        .axis-point .label-root {
+            position: absolute;
+            bottom: 28px;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--blue);
+            white-space: nowrap;
+            background: rgba(0,0,0,0.6);
+            padding: 4px 12px;
+            border-radius: 10px;
+        }
+        .axis-point .label-val {
+            position: absolute;
+            top: 28px;
+            font-size: 1.3rem;
+            opacity: 0.9;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 10px;
+            border-radius: 8px;
+            color: var(--peach);
+            font-weight: bold;
+        }
+
+        /* HEDEF İĞNESİ */
+        .target-point {
+            position: absolute;
+            top: 28%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+            transition: left 0.5s ease;
+        }
+        .target-point .pin-head {
+            width: 24px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px var(--red);
+            position: relative;
+            z-index: 2;
+        }
+        .target-point .pin-line {
+            width: 4px;
+            height: 60px;
+            background: var(--red);
+            position: absolute;
+            top: 24px;
+            z-index: 1;
+            box-shadow: 0 0 12px var(--red);
+        }
+        .target-point .label-target {
+            position: absolute;
+            bottom: 32px;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--red);
+            background: #111;
+            padding: 6px 16px;
+            border-radius: 12px;
+            border: 2px solid var(--red);
+            white-space: nowrap;
+            box-shadow: 0 0 30px rgba(243, 139, 168, 0.4);
+        }
+
+        /* IŞIKLI TAM KARE LİSTESİ */
+        .kare-baslik {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--sky);
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-top: 12px;
+        }
+        .tam-kare-container {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding: 12px 6px 16px 6px;
+            scrollbar-width: thin;
+            width: 100%;
+            justify-content: flex-start;
+        }
+        .tam-kare-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .tam-kare-container::-webkit-scrollbar-thumb {
+            background: var(--blue);
+            border-radius: 12px;
+        }
+        .tam-kare-container::-webkit-scrollbar-track {
+            background: #313244;
+            border-radius: 12px;
+        }
+        .kare-kutu {
+            flex: 0 0 80px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #313244;
+            border: 3px solid #45475a;
+            border-radius: 14px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            line-height: 1.5;
+            color: var(--text);
+        }
+        .kare-kutu .kok {
+            font-size: 1.3rem;
+        }
+        .kare-kutu .deger {
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+        .kare-kutu.highlight {
+            transform: scale(1.15);
+            background: var(--yellow);
+            color: #111;
+            border-color: #fff;
+            box-shadow: 0 0 35px var(--yellow), 0 0 70px rgba(249, 226, 175, 0.5);
+            z-index: 5;
+        }
+        .kare-kutu.highlight .deger {
+            opacity: 0.9;
+            color: #222;
+        }
+
+        .proportion-math {
+            width: 100%;
+            background: #181825;
+            padding: 24px 20px;
+            border-radius: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.15rem;
+            line-height: 2;
+            border: 1px solid #313244;
+            margin-top: 10px;
+            color: var(--text);
+        }
+        .proportion-math strong {
+            color: var(--yellow);
+            font-weight: 700;
+        }
+        .proportion-math .highlight-text {
+            color: var(--green);
+            font-weight: bold;
+            font-size: 1.4rem;
+        }
+        .proportion-math .step-num {
+            color: var(--blue);
+            font-weight: bold;
+        }
+        .proportion-math .result-box {
+            background: #2a2a3a;
+            padding: 8px 16px;
+            border-radius: 10px;
+            display: inline-block;
+            border-left: 4px solid var(--green);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 18px; }
+            .visual-area { padding: 18px; }
+            .kare-kutu { flex: 0 0 68px; width: 68px; height: 68px; }
+            .target-point .label-target { font-size: 1.2rem; bottom: 38px; }
+            .axis-point .label-root { font-size: 1.2rem; }
+            .axis-point .label-val { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📐 Karekök Dedektörü</h1>
+
+    <div class="grid-2">
+        <!-- KONTROLLER -->
+        <div class="controls">
+            <h3>⚙️ Ayarlar</h3>
+            <div class="input-group">
+                <label for="m3Input">Kök içindeki sayı:</label>
+                <div class="input-row">
+                    <input type="range" id="m3Input" min="2" max="99" value="20" />
+                    <span class="badge" id="m3InputVal">20</span>
+                </div>
+                <!-- YENİ STEP BUTONLARI -->
+                <div class="step-buttons">
+                    <button class="btn-step" id="btnDecrease">◀</button>
+                    <button class="btn-step" id="btnIncrease">▶</button>
+                </div>
+            </div>
+            <div class="info-box">
+                <strong>📌 Müfredat Köprüsü:</strong> Kareköklü bir sayının yaklaşık değerini tahmin etmek, aslında <strong>doğrusal oran-orantı</strong> mantığıdır. İki tam kare arasındaki mesafeyi adımlara bölüp, hedef sayının nerede olduğunu bularak tahmin yapabiliriz.
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn-extra" onclick="rastgeleSayi()">Rastgele Sayı</button>
+                <button class="btn-extra green" onclick="sifirla()">Sıfırla (20)</button>
+            </div>
+        </div>
+
+        <!-- GÖRSEL -->
+        <div class="visual-area">
+            <h3>📈 Sayı Doğrusu ve Cetvel</h3>
+
+            <div class="axis-container">
+                <div class="axis-line"></div>
+
+                <!-- CETVEL ÇİZGİLERİ (alt kısım) -->
+                <div class="scale-ticks" id="scaleTicks"></div>
+
+                <!-- SOL TAM KARE -->
+                <div class="axis-point" style="left: 10%;">
+                    <div class="label-root" id="rootLeft">√16</div>
+                    <div class="dot"></div>
+                    <div class="label-val" id="valLeft">4</div>
+                </div>
+
+                <!-- SAĞ TAM KARE -->
+                <div class="axis-point" style="left: 90%;">
+                    <div class="label-root" id="rootRight">√25</div>
+                    <div class="dot"></div>
+                    <div class="label-val" id="valRight">5</div>
+                </div>
+
+                <!-- HEDEF İĞNESİ -->
+                <div class="target-point" id="targetPoint" style="left: 50%;">
+                    <div class="label-target" id="rootTarget">√20</div>
+                    <div class="pin-head"></div>
+                    <div class="pin-line"></div>
+                </div>
+            </div>
+
+            <!-- IŞIKLI TAM KARE LİSTESİ -->
+            <div style="width:100%;">
+                <div class="kare-baslik">✦ Tam Kare İskeleti ✦</div>
+                <div class="tam-kare-container" id="kareListe"></div>
+            </div>
+
+            <!-- ORANTI AÇIKLAMASI -->
+            <div class="proportion-math" id="m3Math">
+                ← Sayıyı değiştir, oran-orantıyı gör!
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const inputSlider = document.getElementById('m3Input');
+        const inputVal = document.getElementById('m3InputVal');
+        const rootLeft = document.getElementById('rootLeft');
+        const valLeft = document.getElementById('valLeft');
+        const rootRight = document.getElementById('rootRight');
+        const valRight = document.getElementById('valRight');
+        const rootTarget = document.getElementById('rootTarget');
+        const targetPoint = document.getElementById('targetPoint');
+        const scaleTicks = document.getElementById('scaleTicks');
+        const kareListe = document.getElementById('kareListe');
+        const mathDiv = document.getElementById('m3Math');
+
+        window.rastgeleSayi = function() {
+            const r = Math.floor(Math.random() * 98) + 2;
+            inputSlider.value = r;
+            updateModule3();
+        };
+        window.sifirla = function() {
+            inputSlider.value = 20;
+            updateModule3();
+        };
+
+        function updateModule3() {
+            const input = parseInt(inputSlider.value);
+            inputVal.textContent = input;
+
+            // 1) Tam kare sınırlarını bul
+            let solTamKare = 1, sagTamKare = 4;
+            for (let i = 1; i <= 10; i++) {
+                if (i * i <= input) {
+                    solTamKare = i * i;
+                    sagTamKare = (i + 1) * (i + 1);
+                }
+            }
+            if (sagTamKare > 100) sagTamKare = 100;
+
+            const solKok = Math.sqrt(solTamKare);
+            const sagKok = Math.sqrt(sagTamKare);
+
+            // 2) Etiketler
+            rootLeft.textContent = `√${solTamKare}`;
+            valLeft.textContent = solKok;
+            rootRight.textContent = `√${sagTamKare}`;
+            valRight.textContent = sagKok;
+            rootTarget.textContent = `√${input}`;
+
+            // 3) Orantı
+            const toplamMesafe = sagTamKare - solTamKare;
+            const sayininMesafesi = input - solTamKare;
+            const oran = toplamMesafe > 0 ? sayininMesafesi / toplamMesafe : 0;
+
+            // 4) İğne konumu
+            const leftPercent = 10 + (oran * 80);
+            targetPoint.style.left = `${leftPercent}%`;
+
+            // 5) CETVEL ÇİZGİLERİ + NUMARALARI
+            scaleTicks.innerHTML = '';
+            if (toplamMesafe > 0) {
+                for (let i = 0; i < toplamMesafe; i++) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'tick-wrapper';
+
+                    const tick = document.createElement('div');
+                    tick.className = 'tick-mark';
+                    if (i + 1 <= sayininMesafesi) {
+                        tick.classList.add('highlight-tick');
+                    }
+
+                    const label = document.createElement('span');
+                    label.className = 'tick-label';
+                    label.textContent = i + 1;
+
+                    wrapper.appendChild(tick);
+                    wrapper.appendChild(label);
+                    scaleTicks.appendChild(wrapper);
+                }
+            }
+
+            // 6) Işıklı tam kare listesi
+            kareListe.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const val = i * i;
+                const div = document.createElement('div');
+                div.className = 'kare-kutu';
+                if (val === solTamKare || val === sagTamKare) {
+                    div.classList.add('highlight');
+                }
+                div.innerHTML = `<span class="kok">√${val}</span><span class="deger">(${i})</span>`;
+                kareListe.appendChild(div);
+            }
+
+            // 7) Açıklama metni (büyük ve vurgulu)
+            const gercekDeger = Math.sqrt(input).toFixed(4);
+            const tahmin = (solKok + oran).toFixed(4);
+            mathDiv.innerHTML = `
+                <strong>📊 ADIM ADIM ORAN-ORANTI</strong><br>
+                1️⃣ Sayımız <strong>${solTamKare}</strong> ile <strong>${sagTamKare}</strong> arasında.<br>
+                2️⃣ Kök değeri <strong>${solKok}</strong> ile <strong>${sagKok}</strong> arasında.<br><br>
+                3️⃣ Toplam adım: ${sagTamKare} - ${solTamKare} = <span class="step-num">${toplamMesafe}</span> adım.<br>
+                4️⃣ Gidilen adım: ${input} - ${solTamKare} = <span class="step-num">${sayininMesafesi}</span> adım.<br>
+                5️⃣ İlerleme oranı: ${sayininMesafesi} / ${toplamMesafe} = <strong>${oran.toFixed(4)}</strong><br><br>
+                🎯 <strong>Tahmin:</strong> ${solKok} + ${oran.toFixed(4)} = <span class="highlight-text">${tahmin}</span><br>
+                📱 Gerçek değer: <span style="color:var(--green); font-weight:bold; font-size:1.3rem;">${gercekDeger}</span><br>
+                <span style="color:var(--yellow);">✅ Cetveldeki sarı çizgiler, soldan itibaren kaç adım ilerlediğimizi gösterir.</span>
+            `;
+        }
+
+        // YENİ: Adım butonları
+        document.getElementById('btnDecrease').addEventListener('click', function() {
+            let val = parseInt(inputSlider.value);
+            const min = parseInt(inputSlider.min);
+            if (val > min) {
+                inputSlider.value = val - 1;
+                updateModule3();
+            }
+        });
+        document.getElementById('btnIncrease').addEventListener('click', function() {
+            let val = parseInt(inputSlider.value);
+            const max = parseInt(inputSlider.max);
+            if (val < max) {
+                inputSlider.value = val + 1;
+                updateModule3();
+            }
+        });
+
+        inputSlider.addEventListener('input', updateModule3);
+        updateModule3();
+    })();
+</script>
+</body>
+</html>

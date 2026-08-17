@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎯 6. Sınıf Dinamik Oran Laboratuvarı</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --input-bg: #334155;
+            --primary: #38bdf8;
+            --pos: #4ade80;
+            --warn: #facc15;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 15px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1550px;
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 26px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+        }
+
+        .app-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .sidebar {
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar-title {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 6px 10px;
+        }
+
+        .sidebar-btn {
+            background: var(--input-bg);
+            border: 2px solid transparent;
+            color: var(--text);
+            padding: 14px 16px;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            line-height: 1.3;
+        }
+
+        .sidebar-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .sidebar-btn.active {
+            background: var(--primary);
+            color: #0f172a;
+            font-weight: 700;
+            border-color: var(--primary);
+        }
+
+        .workspace {
+            background: rgba(15, 23, 42, 0.4);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 26px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            min-height: 580px;
+        }
+
+        .scenario-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .scenario-title {
+            font-size: 1.6rem;
+            color: var(--warn);
+            font-weight: 700;
+        }
+
+        .btn-group-top {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            touch-action: manipulation;
+        }
+
+        .action-btn.show-btn {
+            background: var(--pos);
+            color: #0f172a;
+        }
+
+        .action-btn.new-btn {
+            background: var(--primary);
+            color: #0f172a;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .question-card {
+            background: var(--input-bg);
+            border-left: 6px solid var(--primary);
+            padding: 22px 26px;
+            border-radius: 16px;
+            font-size: 1.35rem;
+            line-height: 1.6;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .solution-container {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .solution-container.visible {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .solution-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .visual-panel {
+            background: rgba(15, 23, 42, 0.7);
+            border: 2px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            text-align: center;
+        }
+
+        .step-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .step-card {
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 1.15rem;
+            line-height: 1.5;
+        }
+
+        .step-card b {
+            color: var(--warn);
+        }
+
+        .result-card {
+            background: rgba(74, 222, 128, 0.15);
+            border: 2px solid var(--pos);
+            color: var(--pos);
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 1.35rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .placeholder-box {
+            background: rgba(15, 23, 42, 0.5);
+            border: 2px dashed var(--border);
+            border-radius: 18px;
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .app-layout { grid-template-columns: 1fr; }
+            .solution-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🎯 6. Sınıf Dinamik Oran Laboratuvarı</h1>
+    </header>
+
+    <div class="app-layout">
+        <div class="sidebar">
+            <div class="sidebar-title">Soru Senaryoları</div>
+            <button class="sidebar-btn active" onclick="selectScenario(1)">
+                <span>🍕</span> Parça - Bütün İlişkisi (10 Tema)
+            </button>
+            <button class="sidebar-btn" onclick="selectScenario(2)">
+                <span>📏</span> Birimsiz Oran ve Dönüşüm
+            </button>
+            <button class="sidebar-btn" onclick="selectScenario(3)">
+                <span>🚗</span> Birimli Oran ve Hız (km/s)
+            </button>
+            <button class="sidebar-btn" onclick="selectScenario(4)">
+                <span>✖️</span> Kat İlişkisi ve Denk Oran
+            </button>
+            <button class="sidebar-btn" onclick="selectScenario(5)">
+                <span>🔲</span> Görsel / Kareli Zemin
+            </button>
+            <button class="sidebar-btn" onclick="selectScenario(6)">
+                <span>🗺️</span> Harita ve Maket Ölçeği
+            </button>
+            <button class="sidebar-btn" onclick="selectScenario(7)">
+                <span>⚡</span> Hız / Fiyat Karşılaştırma
+            </button>
+            <button class="sidebar-btn" onclick="selectScenario(8)">
+                <span>🍋</span> Tarif ve Karışım Soruları
+            </button>
+        </div>
+
+        <div class="workspace" id="workspace">
+            <!-- JS Dinamik İçerik -->
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentScenarioId = 1;
+    let isSolutionVisible = false;
+
+    function rand(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function pickRandom(arr) {
+        return arr[rand(0, arr.length - 1)];
+    }
+
+    function gcd(a, b) {
+        return b === 0 ? a : gcd(b, a % b);
+    }
+
+    const scenarioGenerators = {
+        // 1. Parça - Bütün (MEB UYUMLU 10 TEMA)
+        1: () => {
+            const themes = [
+                { title: "Sınıf Mevcudu", p1: "Kız Öğrenci", p2: "Erkek Öğrenci", whole: "tüm sınıf mevcuduna", emoji1: "👧", emoji2: "👦", intro: "Bir sınıftaki" },
+                { title: "Meyve Sepeti", p1: "Kırmızı Elma", p2: "Yeşil Elma", whole: "tüm sepetteki meyvelere", emoji1: "🍎", emoji2: "🍏", intro: "Bir sepetteki" },
+                { title: "Basketbol Maçı", p1: "İsabetli Atış", p2: "Kaçan Atış", whole: "tüm atışların sayısına", emoji1: "🏀", emoji2: "❌", intro: "Bir maçtaki" },
+                { title: "Otopark Araçları", p1: "Beyaz Araba", p2: "Siyah Araba", whole: "otoparktaki tüm araçlara", emoji1: "⚪", emoji2: "⚫", intro: "Bir otoparktaki" },
+                { title: "Bilye Torbası", p1: "Mavi Bilye", p2: "Kırmızı Bilye", whole: "torbadaki tüm bilyelere", emoji1: "🔵", emoji2: "🔴", intro: "Bir torbadaki" },
+                { title: "Kitaplık Rafı", p1: "Hikaye Kitabı", p2: "Roman", whole: "raftaki tüm kitaplara", emoji1: "📚", emoji2: "📘", intro: "Bir kütüphanedeki" },
+                { title: "Çiçek Demeti", p1: "Gül", p2: "Papatya", whole: "vazodaki tüm çiçeklere", emoji1: "🌹", emoji2: "🌼", intro: "Bir vazodaki" },
+                { title: "Okul Kalemliği", p1: "Kurşun Kalem", p2: "Tükenmez Kalem", whole: "kalemlikteki tüm kalemlere", emoji1: "✏️", emoji2: "🖊️", intro: "Bir kalemlikteki" },
+                { title: "Sınav Soruları", p1: "Doğru Cevap", p2: "Yanlış Cevap", whole: "testteki tüm sorulara", emoji1: "✅", emoji2: "❌", intro: "Bir sınavdaki" },
+                { title: "Meyve Suyu", p1: "Portakal Sıkımı", p2: "Havuç Sıkımı", whole: "karışımın tamamına", emoji1: "🍊", emoji2: "🥕", intro: "Bir sürahideki" }
+            ];
+
+            const t = pickRandom(themes);
+            const n1 = rand(2, 6);
+            const n2 = rand(3, 7);
+            const total = n1 + n2;
+            const g = gcd(n1, total);
+
+            return {
+                title: `1. Parça - Bütün İlişkisi (${t.title})`,
+                question: `${t.intro} ${t.p1.toLowerCase()} sayısının ${t.p2.toLowerCase()} sayısına oranı <b>${n1} / ${n2}</b>'dir. Buna göre ${t.p1.toLowerCase()} sayısının <b>${t.whole}</b> oranı kaçtır?`,
+                renderVisual: () => `
+                    <div style="font-size:1.2rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">${t.title} Modeli</div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span style="color:var(--warn); font-size:1.05rem; font-weight:bold;">${t.p1} (${n1} Kat):</span>
+                        <span style="font-size:1.5rem;">${t.emoji1.repeat(n1)}</span>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+                        <span style="color:var(--primary); font-size:1.05rem; font-weight:bold;">${t.p2} (${n2} Kat):</span>
+                        <span style="font-size:1.5rem;">${t.emoji2.repeat(n2)}</span>
+                    </div>
+                    <div style="margin-top:15px; padding:10px 16px; background:var(--input-bg); border-radius:12px; font-weight:bold;">
+                        Tamamı (Bütün) = ${n1} + ${n2} = <span style="color:var(--pos)">${total} Kat</span>
+                    </div>
+                `,
+                steps: [
+                    `<b>1. Adım:</b> ${t.p1} miktarı = <b>${n1} Kat</b>`,
+                    `<b>2. Adım:</b> ${t.p2} miktarı = <b>${n2} Kat</b>`,
+                    `<b>3. Adım:</b> Tamamı (Bütün) = ${n1} + ${n2} = <b>${total} Kat</b>`
+                ],
+                result: `${t.p1} / Bütün = ${n1} / ${total} ${g > 1 ? `(Sadeleşmiş Hali: ${n1/g}/${total/g})` : ''}`
+            };
+        },
+
+        // 2. Birimsiz Oran
+        2: () => {
+            const themes = [
+                { item1: "ip", item2: "tel", unit1: "cm", unit2: "metre", factor: 100, icon: "📏" },
+                { item1: "silgi", item2: "sıra", unit1: "mm", unit2: "cm", factor: 10, icon: "✏️" },
+                { item1: "su bardağı", item2: "sürahi", unit1: "mL", unit2: "litre", factor: 1000, icon: "🥛" },
+                { item1: "elma", item2: "çuval", unit1: "gram", unit2: "kg", factor: 1000, icon: "⚖️" }
+            ];
+            const t = pickRandom(themes);
+            const val1 = rand(2, 8) * (t.factor === 1000 ? 50 : (t.factor === 100 ? 5 : 2));
+            const val2 = rand(2, 5);
+            const val2Converted = val2 * t.factor;
+            const g = gcd(val1, val2Converted);
+
+            return {
+                title: `2. Birimsiz Oran ve Dönüşüm (${t.item1.toUpperCase()} / ${t.item2.toUpperCase()})`,
+                question: `<b>${val1} ${t.unit1}</b> olan ${t.item1} ile <b>${val2} ${t.unit2}</b> olan ${t.item2} miktarının oranı kaçtır?`,
+                renderVisual: () => `
+                    <div style="font-size:1.2rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">${t.icon} Birim Eşitleme</div>
+                    <div style="background:var(--input-bg); padding:14px; border-radius:14px; width:100%;">
+                        <div style="font-size:1.25rem; font-weight:bold; color:var(--warn)">${val2} ${t.unit2} = ${val2Converted} ${t.unit1}</div>
+                        <div style="font-size:0.95rem; color:var(--text-muted); margin-top:4px;">İkisi de ${t.unit1} olunca birimler sadeleşir!</div>
+                    </div>
+                `,
+                steps: [
+                    `<b>1. Adım:</b> Büyük birimi küçüğe çevir: <b>${val2} ${t.unit2} = ${val2Converted} ${t.unit1}</b>`,
+                    `<b>2. Adım:</b> Kesri kur: <b>${val1} ${t.unit1} / ${val2Converted} ${t.unit1}</b>`,
+                    `<b>3. Adım:</b> Birimler sadeleştiği için sonuç <b>Birimsiz Orandır</b>.`
+                ],
+                result: `Oran = ${val1} / ${val2Converted} = ${val1/g} / ${val2Converted/g} (Birimsiz)`
+            };
+        },
+
+        // 3. Birimli Oran & Hız
+        3: () => {
+            const themes = [
+                { vehicle: "Otomobil", icon: "🏎️" },
+                { vehicle: "Motosiklet", icon: "🏍️" },
+                { vehicle: "Hızlı Tren", icon: "🚅" },
+                { vehicle: "Çita", icon: "🐆" }
+            ];
+            const t = pickRandom(themes);
+            const speedKm = rand(2, 7) * 18;
+            const meters = speedKm * 1000;
+            const speedMs = meters / 3600;
+
+            return {
+                title: `3. Birimli Oran ve Hız (${t.vehicle})`,
+                question: `Bir <b>${t.vehicle.toLowerCase()}</b> saatte <b>${speedKm} km</b> hızla ilerlemektedir. Bu hareketlinin hızının <b>m/sn (metre/saniye)</b> cinsinden birimli oranı nedir?`,
+                renderVisual: () => `
+                    <div style="font-size:1.2rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">${t.icon} Hız Dönüşümü</div>
+                    <div style="font-size:1.1rem; line-height:1.8;">
+                        📏 <b>Yol:</b> ${speedKm} km = ${meters.toLocaleString('tr-TR')} metre<br>
+                        ⏱️ <b>Zaman:</b> 1 saat = 3.600 saniye
+                    </div>
+                `,
+                steps: [
+                    `<b>1. Adım:</b> Kilometreyi metreye çevir: <b>${speedKm} km = ${meters.toLocaleString('tr-TR')} m</b>`,
+                    `<b>2. Adım:</b> Saati saniyeye çevir: <b>1 saat = 3.600 sn</b>`,
+                    `<b>3. Adım:</b> Metreyi saniyeye böl: <b>${meters.toLocaleString('tr-TR')} / 3.600</b>`
+                ],
+                result: `Hız = ${speedMs} m/sn (Birimli Oran)`
+            };
+        },
+
+        // 4. Denk Oran
+        4: () => {
+            const themes = [
+                { item1: "kırmızı bilye", item2: "mavi bilye", context: "Bir torbadaki" },
+                { item1: "un (bardak)", item2: "şeker (bardak)", context: "Bir kek tarifindeki" },
+                { item1: "çam ağacı", item2: "meşe ağacı", context: "Bir korudaki" },
+                { item1: "roman", item2: "hikaye kitabı", context: "Bir kitaplıktaki" }
+            ];
+            const t = pickRandom(themes);
+            const a = rand(2, 5);
+            const b = rand(6, 9);
+            const multiplier = rand(3, 6);
+            const B = b * multiplier;
+            const A = a * multiplier;
+
+            return {
+                title: `4. Kat İlişkisi / Denk Oran (${t.item1} - ${t.item2})`,
+                question: `${t.context} ${t.item1} sayısının ${t.item2} sayısına oranı <b>${a} / ${b}</b>'dir. Ortamda <b>${B} adet ${t.item2}</b> olduğuna göre kaç adet ${t.item1} vardır?`,
+                renderVisual: () => `
+                    <div style="font-size:1.2rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">Genişletme Katı</div>
+                    <div style="background:var(--input-bg); padding:12px 20px; border-radius:14px; font-size:1.25rem; font-weight:bold;">
+                        ${b} ➔ ${B} ( <span style="color:var(--warn);">${b} x ${multiplier} = ${B}</span> )
+                    </div>
+                    <div style="color:var(--pos); font-weight:bold; margin-top:8px;">Genişletme Katı = ${multiplier} Kat</div>
+                `,
+                steps: [
+                    `<b>1. Adım:</b> Temel Oran = <b>${a} / ${b}</b>`,
+                    `<b>2. Adım:</b> Payda (${t.item2}) ${b}'den ${B}'ye <b>${multiplier} katına</b> çıkmış.`,
+                    `<b>3. Adım:</b> Payı da (${t.item1}) ${multiplier} ile çarp: <b>${a} x ${multiplier}</b>`
+                ],
+                result: `${t.item1.toUpperCase()} Miktarı = ${A} Adet`
+            };
+        },
+
+        // 5. Görsel Area
+        5: () => {
+            const total = 20;
+            const colored = rand(4, 14);
+            const uncolored = total - colored;
+            const g = gcd(colored, uncolored);
+
+            return {
+                title: "5. Görsel ve Kareli Zemin Oran Soruları",
+                question: `20 eş kareye bölünmüş bir panoda <b>${colored} kare</b> maviye boyanmıştır. Boyalı kare sayısının <b>boyasız kare sayısına</b> oranı kaçtır?`,
+                renderVisual: () => `
+                    <div style="font-size:1.2rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">Pano Sayımı</div>
+                    <div style="display:grid; grid-template-columns:repeat(5, 28px); gap:6px;">
+                        ${'<div style="width:28px;height:28px;background:var(--primary);border-radius:6px;"></div>'.repeat(colored)}
+                        ${'<div style="width:28px;height:28px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;"></div>'.repeat(uncolored)}
+                    </div>
+                `,
+                steps: [
+                    `<b>1. Adım:</b> Boyalı Kare Sayısı = <b>${colored}</b>`,
+                    `<b>2. Adım:</b> Boyasız Kare Sayısı = 20 - ${colored} = <b>${uncolored}</b>`,
+                    `<b>3. Adım:</b> Oranı kur: <b>${colored} / ${uncolored}</b>`
+                ],
+                result: `Boyalı / Boyasız = ${colored / g} / ${uncolored / g}`
+            };
+        },
+
+        // 6. Harita & Ölçek
+        6: () => {
+            const themes = [
+                { type: "Mimari Çizim", obj: "Bina", icon: "🏢" },
+                { type: "Şehir Haritası", obj: "Mesafe", icon: "🗺️" },
+                { type: "Otomobil Maketi", obj: "Araba", icon: "🚗" }
+            ];
+            const t = pickRandom(themes);
+            const real = rand(5, 25) * 10;
+
+            return {
+                title: `6. Harita ve Ölçek Soruları (${t.type})`,
+                question: `Gerçek boyu <b>${real} cm</b> olan bir ${t.obj.toLowerCase()} modelinin çizimdeki boyu <b>1 cm</b>'dir. Bu çizimin **ölçek oranı** nedir?`,
+                renderVisual: () => `
+                    <div style="font-size:1.2rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">${t.icon} Ölçek Mantığı</div>
+                    <div style="font-size:1.15rem;">
+                        📏 Çizim/Model Boyu: <b>1 cm</b><br>
+                        🌍 Gerçek Boyut: <b>${real} cm</b>
+                    </div>
+                `,
+                steps: [
+                    `<b>1. Adım:</b> Ölçek Formülü = <b>Plan Boyu / Gerçek Boy</b>`,
+                    `<b>2. Adım:</b> Değerleri yerine koy: <b>1 / ${real}</b>`,
+                    `<b>3. Adım:</b> Pay 1 olduğu için oran sadeleşmiş haldedir.`
+                ],
+                result: `Ölçek Oranı = 1 / ${real}`
+            };
+        },
+
+        // 7. Karşılaştırma
+        7: () => {
+            const isPriceQuery = rand(0, 1) === 1;
+
+            if (isPriceQuery) {
+                const priceA = rand(4, 8) * 10;
+                const kgA = rand(2, 4);
+                const priceB = rand(5, 9) * 10;
+                const kgB = rand(2, 5);
+
+                const unitA = priceA / kgA;
+                const unitB = priceB / kgB;
+
+                const winner = unitA < unitB ? 'A Markası' : (unitB < unitA ? 'B Markası' : 'İkisinin de Birim Fiyatı Eşit');
+
+                return {
+                    title: "7. Karşılaştırma Soruları (Ekonomik Ürün)",
+                    question: `A markasının <b>${kgA} kg zeytini ${priceA} TL</b>, B markasının ise <b>${kgB} kg zeytini ${priceB} TL</b>'dir. Hangi markayı almak daha ekonomiktir?`,
+                    renderVisual: () => `
+                        <div style="font-size:1.2rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">🛒 1 kg Fiyatı Kıyaslaması</div>
+                        <div style="font-size:1.05rem; text-align:left;">
+                            🏷️ <b>A Markası:</b> ${priceA} TL / ${kgA} kg = <span style="color:var(--warn);">${unitA.toFixed(1)} TL/kg</span><br>
+                            🏷️ <b>B Markası:</b> ${priceB} TL / ${kgB} kg = <span style="color:var(--pos);">${unitB.toFixed(1)} TL/kg</span>
+                        </div>
+                    `,
+                    steps: [
+                        `<b>1. Adım:</b> A markasının 1 kg fiyatını bul: <b>${priceA} / ${kgA} = ${unitA.toFixed(1)} TL</b>`,
+                        `<b>2. Adım:</b> B markasının 1 kg fiyatını bul: <b>${priceB} / ${kgB} = ${unitB.toFixed(1)} TL</b>`,
+                        `<b>3. Adım:</b> Birim fiyatı daha düşük olan markayı seç.`
+                    ],
+                    result: `${winner} Daha Ekonomiktir!`
+                };
+            } else {
+                const speedA = rand(5, 8) * 10;
+                const speedB = rand(6, 9) * 10;
+                const timeA = rand(2, 4);
+                const timeB = rand(2, 4);
+                const distA = speedA * timeA;
+                const distB = speedB * timeB;
+
+                const winner = speedA > speedB ? 'A Aracı' : (speedB > speedA ? 'B Aracı' : 'İki Araç da Eşit Hızda');
+
+                return {
+                    title: "7. Karşılaştırma Soruları (Hız Kıyaslama)",
+                    question: `A aracı <b>${timeA} saatte ${distA} km</b>, B aracı ise <b>${timeB} saatte ${distB} km</b> yol gitmiştir. Hangi araç daha hızlıdır?`,
+                    renderVisual: () => `
+                        <div style="font-size:1.2rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">🏎️ Saatlik Hız Kıyası</div>
+                        <div style="font-size:1.05rem; text-align:left;">
+                            🚗 <b>A Aracı:</b> ${distA} / ${timeA} = <span style="color:var(--warn);">${speedA} km/s</span><br>
+                            🏎️ <b>B Aracı:</b> ${distB} / ${timeB} = <span style="color:var(--pos);">${speedB} km/s</span>
+                        </div>
+                    `,
+                    steps: [
+                        `<b>1. Adım:</b> A aracının 1 saatlik hızını bul: <b>${distA} / ${timeA} = ${speedA} km/s</b>`,
+                        `<b>2. Adım:</b> B aracının 1 saatlik hızını bul: <b>${distB} / ${timeB} = ${speedB} km/s</b>`,
+                        `<b>3. Adım:</b> Saatlik hızı yüksek olanı seç.`
+                    ],
+                    result: `${winner} Daha Hızlıdır!`
+                };
+            }
+        },
+
+        // 8. Tarif ve Karışım
+        8: () => {
+            const themes = [
+                { ing1: "limon suyu", ing2: "su", resultProduct: "limonata", icon: "🍋" },
+                { ing1: "mavi boya", ing2: "sarı boya", resultProduct: "yeşil boya", icon: "🎨" },
+                { ing1: "kakao", ing2: "süt", resultProduct: "kakaolu süt", icon: "🥛" },
+                { ing1: "çimento", ing2: "kum", resultProduct: "harç", icon: "🏗️" }
+            ];
+            const t = pickRandom(themes);
+            const p1 = rand(2, 4);
+            const p2 = rand(3, 5);
+            const singleRecipe = p1 + p2;
+            const multiplier = rand(3, 6);
+            const totalTarget = singleRecipe * multiplier;
+            const reqP1 = p1 * multiplier;
+
+            return {
+                title: `8. Karışım ve Tarif Soruları (${t.resultProduct.toUpperCase()})`,
+                question: `Bir tarifte <b>${p1} ölçek ${t.ing1}</b> ile <b>${p2} ölçek ${t.ing2}</b> karıştırılarak ${t.resultProduct} elde ediliyor. Toplam <b>${totalTarget} ölçek ${t.resultProduct}</b> hazırlamak için kaç ölçek ${t.ing1} gerekir?`,
+                renderVisual: () => `
+                    <div style="font-size:1.2rem; font-weight:bold; color:var(--primary); margin-bottom:10px;">${t.icon} Tarif Katları</div>
+                    <div style="font-size:1.1rem;">
+                        🥣 1 Tarif = ${p1} + ${p2} = <b>${singleRecipe} Ölçek Karışım</b><br>
+                        🎯 Hedef Karışım = <b>${totalTarget} Ölçek</b> (${multiplier} Katı)
+                    </div>
+                `,
+                steps: [
+                    `<b>1. Adım:</b> 1 tarifteki toplam miktar = <b>${p1} + ${p2} = ${singleRecipe} ölçek</b>`,
+                    `<b>2. Adım:</b> Hedef miktarın kaç tarif olduğunu bul: <b>${totalTarget} / ${singleRecipe} = ${multiplier} Kat</b>`,
+                    `<b>3. Adım:</b> ${t.ing1} miktarını da ${multiplier} ile genişlet: <b>${p1} x ${multiplier}</b>`
+                ],
+                result: `Gerekli ${t.ing1} = ${reqP1} Ölçek`
+            };
+        }
+    };
+
+    function selectScenario(id) {
+        currentScenarioId = id;
+        
+        const buttons = document.querySelectorAll('.sidebar-btn');
+        buttons.forEach((btn, index) => {
+            btn.classList.toggle('active', index === id - 1);
+        });
+
+        generateNewQuestion();
+    }
+
+    function generateNewQuestion() {
+        isSolutionVisible = false;
+        const data = scenarioGenerators[currentScenarioId]();
+        const workspace = document.getElementById('workspace');
+
+        let stepsHTML = data.steps.map(step => `<div class="step-card">${step}</div>`).join('');
+
+        workspace.innerHTML = `
+            <div class="scenario-header">
+                <div class="scenario-title">${data.title}</div>
+                <div class="btn-group-top">
+                    <button class="action-btn show-btn" onclick="toggleSolution()">
+                        <span>👁️</span> Çözümü Göster
+                    </button>
+                    <button class="action-btn new-btn" onclick="generateNewQuestion()">
+                        <span>🎲</span> Yeni Soru Üret
+                    </button>
+                </div>
+            </div>
+
+            <div class="question-card">
+                ❓ <b>Soru:</b> ${data.question}
+            </div>
+
+            <div class="placeholder-box" id="placeholderBox">
+                🤔 Çözümü kendi kağıdına yaz, ardından yukarıdaki <b>"👁️ Çözümü Göster"</b> butonuna basarak adım adım kontrol et!
+            </div>
+
+            <div class="solution-container" id="solutionContainer">
+                <div class="solution-grid">
+                    <div class="visual-panel">
+                        ${data.renderVisual()}
+                    </div>
+
+                    <div class="step-panel">
+                        ${stepsHTML}
+                        <div class="result-card">
+                            💡 ${data.result}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function toggleSolution() {
+        isSolutionVisible = !isSolutionVisible;
+        const solutionContainer = document.getElementById('solutionContainer');
+        const placeholderBox = document.getElementById('placeholderBox');
+
+        if (isSolutionVisible) {
+            solutionContainer.classList.add('visible');
+            placeholderBox.style.display = 'none';
+        } else {
+            solutionContainer.classList.remove('visible');
+            placeholderBox.style.display = 'block';
+        }
+    }
+
+    // İlk açılış
+    selectScenario(1);
+</script>
+
+</body>
+</html>
