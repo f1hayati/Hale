@@ -571,32 +571,53 @@
             const sayininMesafesi = input - solTamKare;
             const oran = toplamMesafe > 0 ? sayininMesafesi / toplamMesafe : 0;
 
-            // 4) İğne konumu
-            const leftPercent = 10 + (oran * 80);
-            targetPoint.style.left = `${leftPercent}%`;
+            // 4) İğne konumu — GERÇEK KAREKÖK DEĞERİNE GÖRE
+const gercekKok = Math.sqrt(input);
+
+const kokOrani =
+    (gercekKok - solKok) /
+    (sagKok - solKok);
+
+const leftPercent = 10 + (kokOrani * 80);
+
+targetPoint.style.left = `${leftPercent}%`;
+
+
 
             // 5) CETVEL ÇİZGİLERİ + NUMARALARI
-            scaleTicks.innerHTML = '';
-            if (toplamMesafe > 0) {
-                for (let i = 0; i < toplamMesafe; i++) {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'tick-wrapper';
+scaleTicks.innerHTML = '';
+scaleTicks.style.display = 'block'; // Flexbox'ı devre dışı bırakıyoruz ki absolute çalışsın
 
-                    const tick = document.createElement('div');
-                    tick.className = 'tick-mark';
-                    if (i + 1 <= sayininMesafesi) {
-                        tick.classList.add('highlight-tick');
-                    }
+if (toplamMesafe > 0) {
+    // Çizgileri 1'den başlatıp toplam mesafeye kadar çiziyoruz
+    for (let i = 1; i <= toplamMesafe; i++) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'tick-wrapper';
+        
+        // Matematiksel orana göre tam konumlandırma
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = `${(i / toplamMesafe) * 100}%`;
+        wrapper.style.transform = 'translateX(-50%)';
 
-                    const label = document.createElement('span');
-                    label.className = 'tick-label';
-                    label.textContent = i + 1;
+        const tick = document.createElement('div');
+        tick.className = 'tick-mark';
+        
+        // Sayının mesafesine kadar olan çizgileri sarı yak
+        if (i <= sayininMesafesi) {
+            tick.classList.add('highlight-tick');
+        }
 
-                    wrapper.appendChild(tick);
-                    wrapper.appendChild(label);
-                    scaleTicks.appendChild(wrapper);
-                }
-            }
+        const label = document.createElement('span');
+        label.className = 'tick-label';
+        label.textContent = i;
+
+        
+
+        wrapper.appendChild(tick);
+        wrapper.appendChild(label);
+        scaleTicks.appendChild(wrapper);
+    }
+}
 
             // 6) Işıklı tam kare listesi
             kareListe.innerHTML = '';
